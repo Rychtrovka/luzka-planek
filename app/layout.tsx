@@ -1,36 +1,50 @@
-﻿
-import type { Metadata } from "next"
-import { Caladea } from "next/font/google"
-import { Crimson_Pro } from "next/font/google"
-import "./globals.css"
+﻿import type { Metadata, Viewport } from "next";
+import { Crimson_Pro, Caladea } from "next/font/google";
+import "./globals.css";
 
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+// Definice fontů
+const crimson = Crimson_Pro({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "700", "900"],
+  variable: '--font-crimson', // Umožní použití v CSS přes var(--font-crimson)
+});
 
 const caladea = Caladea({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "700"],
-   style: ["normal", "italic"],
-})
+  variable: '--font-caladea',
+});
 
-const crimson = Crimson_Pro({ 
-  subsets: ["latin"],
-  weight: ["400", "700", "900"], // Zde si navolíte extra tučnou 900
-})
+// Správné nastavení viewportu pro mobilní zařízení a kiosky
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
+// Metadata včetně cesty k ikoně
 export const metadata: Metadata = {
   title: "Rychtrovka TV",
   description: "Hotel kiosk TV",
-}
+  icons: {
+    icon: "/favicon.ico", // Ujisti se, že soubor je v public/favicon.ico
+  },
+};
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
+                                     children,
+                                   }: Readonly<{
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang="cs">
-      <body className={crimson.className}>{children}</body>
-    </html>
-  )
+      <html lang="cs" className={`${crimson.variable} ${caladea.variable}`}>
+      <body
+          className={crimson.className}
+          style={{ margin: 0, padding: 0, overflow: 'hidden' }}
+      >
+      {children}
+      </body>
+      </html>
+  );
 }
-

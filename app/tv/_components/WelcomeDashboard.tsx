@@ -1,10 +1,9 @@
 ﻿"use client"
 
 import React from "react"
+import { useWelcomeMessages } from "../_hooks/useWelcomeMessages" // Uprav cestu podle potřeby
 
-type WeatherIcon =
-
-    | "clear" | "partly" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm" | "unknown"
+type WeatherIcon = "clear" | "partly" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm" | "unknown"
 
 const iconToEmoji: Record<WeatherIcon, string> = {
     clear: "☀️", partly: "⛅", cloudy: "☁️", fog: "🌫️", drizzle: "🌦️", rain: "🌧️", snow: "🌨️", storm: "⛈️", unknown: "❔",
@@ -36,32 +35,41 @@ type Props = {
         welcomeTitle: string
         langLabel: string
         welcomeHint: string
-        adminMessages: string      // "Zprávy od správce"
-        noMessages: string         // "Zatím žádné zprávy"
-        receptionUpdate: string    // "Aktualizace z recepce"
-        groupLabel: string         // "Skupina"
-        arrivalLabel: string       // "Příjezd"
-        departureLabel: string     // "Odjezd"
-        weatherTitle: string       // "Počasí venku"
-        snowLabel: string          // "Sníh"
-        today: string              // "Dnes"
-        tomorrow: string           // "Zítra"
-        // ... a další klíče co už máš
+        adminMessages: string
+        noMessages: string
+        receptionUpdate: string
+        groupLabel: string
+        arrivalLabel: string
+        departureLabel: string
+        weatherTitle: string
+        snowLabel: string
+        today: string
+        tomorrow: string
     }
     lang: string
     styles: any
     welcome: WelcomeData
     messages?: string[]
+    hotelId: string // Přidáno pro hook
 }
 
 function formatDay(dateIso: string) {
     return dateIso.slice(5) // MM-DD
 }
 
-export default function WelcomeDashboard({ t, lang, styles, welcome, messages }: Props) {
-    const safeMessages: string[] = Array.isArray(messages) ? messages : []
-    const forecast = welcome?.weather?.forecast ?? []
+export default function WelcomeDashboard({ t, lang, styles, welcome, messages = [], hotelId }: Props) {
+    // Voláme hook s fallbacky pro zprávy i pro skupinu
+    const { messages: dynamicMessages, groupData } = useWelcomeMessages(hotelId, messages, {
+        groupName: welcome.groupName,
+        arrival: welcome.arrival,
+        departure: welcome.departure
+    })
 
+    const displayGroupName = groupData?.groupName || welcome.groupName
+    const displayArrival = groupData?.arrival || welcome.arrival
+    const displayDeparture = groupData?.departure || welcome.departure
+
+    const forecast = welcome?.weather?.forecast ?? []
     const temp = typeof welcome?.weather?.tempC === "number" ? welcome.weather.tempC : null
     const snowDepth = typeof welcome?.weather?.snowDepthCm === "number" ? welcome.weather.snowDepthCm : null
     const snowfall24 = typeof welcome?.weather?.snowfallCm24h === "number" ? welcome.weather.snowfallCm24h : null
@@ -78,13 +86,13 @@ export default function WelcomeDashboard({ t, lang, styles, welcome, messages }:
 
             <div style={{ ...styles.welcomeGrid, gridTemplateColumns: "2fr 1fr", gridAutoRows: "minmax(220px, auto)" }}>
 
-                {/* ZPRÁVY */}
+                {/* ZPRÁVY - Nyní používají dynamicMessages z hooku */}
                 <div style={{ ...styles.wBox, gridColumn: "1 / 2", gridRow: "1 / span 2", minHeight: 520, display: "flex", flexDirection: "column" }}>
                     <div style={styles.wBoxTitle}>{t.adminMessages}</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", paddingRight: 6, flex: 1, marginTop: 10 }}>
-                        {safeMessages.length ? (
-                            safeMessages.map((msg, idx) => (
-                                <div key={idx} style={{ background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, padding: "12px 14px", fontSize: 22, fontWeight: 650 }}>
+                        {dynamicMessages.length ? (
+                            dynamicMessages.map((msg, idx) => (
+                                <div key={idx} style={{ background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, padding: "12px 14px", fontSize: 25, fontWeight: 500 }}>
                                     {msg}
                                 </div>
                             ))
@@ -95,18 +103,18 @@ export default function WelcomeDashboard({ t, lang, styles, welcome, messages }:
                     <div style={styles.wBoxHint}>{t.receptionUpdate}</div>
                 </div>
 
-                {/* SKUPINA */}
+                {/* SKUPINA - TEĎ DYNAMICKÁ */}
                 <div style={{ ...styles.wBox, gridColumn: "2 / 3", gridRow: "1 / 2" }}>
                     <div style={styles.wBoxTitle}>{t.groupLabel}</div>
-                    <div style={styles.wBoxBig}>{welcome.groupName}</div>
+                    <div style={styles.wBoxBig}>{displayGroupName}</div>
                     <div style={styles.wBoxRow}>
                         <div>
                             <div style={styles.wBoxLabel}>{t.arrivalLabel}</div>
-                            <div style={styles.wBoxValue}>{welcome.arrival}</div>
+                            <div style={styles.wBoxValue}>{displayArrival}</div>
                         </div>
                         <div>
                             <div style={styles.wBoxLabel}>{t.departureLabel}</div>
-                            <div style={styles.wBoxValue}>{welcome.departure}</div>
+                            <div style={styles.wBoxValue}>{displayDeparture}</div>
                         </div>
                     </div>
                 </div>
@@ -125,7 +133,6 @@ export default function WelcomeDashboard({ t, lang, styles, welcome, messages }:
                     <div style={styles.wForecast}>
                         {forecast.length ? (
                             forecast.slice(0, 3).map((d, idx) => {
-                                // Internacionalizace Dnes / Zítra
                                 const labelDay = d.day ?? (d.date ? (idx === 0 ? t.today : idx === 1 ? t.tomorrow : formatDay(d.date)) : `+${idx}`)
                                 const emoji = iconToEmoji[d.icon ?? "unknown"]
 

@@ -17,7 +17,7 @@ export
     overflow: "hidden",
     fontFamily: "inherit",
    // color: "#cc422D",
-    color: "#cc2222",
+    color: "#ff2222",
 
     // ? background only once here:
     backgroundImage: "url('/media/rychtrovka-illustration.png')",
@@ -53,11 +53,12 @@ export
   },
 
   header: {
-    fontSize: 48,
+    fontSize: 40,
     marginBottom: 40,
     textShadow: "0 4px 20px rgba(0,0,0,0.8)",
     color: "#FF2222",
     fontWeight: 900,
+
   },
 
   title: {
@@ -247,10 +248,10 @@ export
   },
 
   wBoxTitle: {
-    fontSize: 40,
+    fontSize: 45,
     fontWeight:900,
-      color: "#cc2222",
-    opacity: 0.85,
+      color: "#ff2222",
+    opacity: 0.95,
     letterSpacing: "0.3px",
   },
 
@@ -281,7 +282,7 @@ export
     fontSize: 26,
     lineHeight: 1.25,
     fontWeight: 500,
-    color: ("white"),
+    color: ("yellow"),
   },
 
   wBoxHint: {
@@ -304,8 +305,8 @@ export
   },
 
   wTempSub: {
-    fontSize: 16,
-    opacity: 0.7,
+    fontSize: 26,
+    opacity: 0.9,
   },
 
   wForecast: {
@@ -328,9 +329,10 @@ export
   },
 
   wForecastNums: {
-    fontSize: 18,
-    fontWeight: 700,
+    fontSize: 30,
+    fontWeight: 900,
     marginTop: 6,
+    color: ("blue"),
   },
 
   wForecastLabel: {
@@ -391,7 +393,7 @@ wBoxWeather: {
   msgText: {
     fontSize: 24,
     lineHeight: 1.25,
-    fontWeight: 700,
+    fontWeight: 500,
   },
 
   msgEmpty: {

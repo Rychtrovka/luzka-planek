@@ -17,6 +17,8 @@ import MenuScreen from "./_components/MenuScreen"
 import DetailScreen from "./_components/DetailScreen"
 import VideoScreen, {VideoKey} from "./_components/VideoScreen"
 
+
+
 // Pomocné funkce mimo komponentu pro čistší tělo
 const formatTime = (sec: number) => {
   const s = Math.max(0, Math.floor(sec || 0))
@@ -55,10 +57,12 @@ export default function TVPage() {
     timezone: kioskConfig.location.timezone,
   })
 
+/*
   const { messages } = useWelcomeMessages(
       kioskConfig.hotelId,
       kioskConfig.welcome.messages
   )
+    */
 
   // --- MEMOIZED DATA ---
   // Transformace dat počasí, aby se nepřepočítávala při každém renderu
@@ -119,9 +123,10 @@ export default function TVPage() {
             <WelcomeDashboard
                 t={t}
                 lang={lang}
+                hotelId="rychtrovka"
                 styles={styles}
                 welcome={welcomeData}
-                messages={messages}
+                //messages={messages}
             />
         )
       case "MENU":
