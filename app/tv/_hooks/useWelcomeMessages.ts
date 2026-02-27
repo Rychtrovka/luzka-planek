@@ -26,12 +26,20 @@ export function useWelcomeMessages(hotelId: string, fallback: string[], fallback
 
     const formatFirestoreValue = (val: any): string => {
         if (!val) return "";
-        // Pokud je to Firebase Timestamp (má metodu toDate)
-        if (typeof val.toDate === 'function') {
+
+        if (val && typeof val.toDate === 'function') {
             const d = val.toDate();
-            return `${d.getDate()}. ${d.getMonth() + 1}.`; // Formát "27. 2."
+            const den = d.getDate();
+            const mesic = d.getMonth() + 1;
+            const rok = d.getFullYear() + 1;
+            const hodiny = d.getHours();
+            // Zajistíme, aby minuty měly vždy dvě cifry (např. 14:05 místo 14:5)
+            const minuty = String(d.getMinutes()).padStart(2, '0');
+
+            // Výsledek: "27. 2. 14:05"
+            return `${den}. ${mesic}.${rok}  / ${hodiny}:${minuty}`;
         }
-        // Pokud je to už string, vrátíme ho
+
         return String(val);
     };
 

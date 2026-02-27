@@ -17,23 +17,26 @@ const copy: Record<Lang, { title: string; blocks: { title: string; lines: string
     cs: {
         title: "Užitečné informace",
         hint: "Zpět = Escape / Back",
-        menus: "Jídelní lístky (PDF)",
-        timetables: "Jízdní řády (PDF)",
+        menus: "Jídelní lístky doporučených resturací",
+        timetables: "Jízdní řády místních linek" +
+            "",
         blocks: [
-            { title: "📶  Wi-Fi", lines: ["Síť: RB_Agnes", "Heslo: 76117611.."] },
-            { title: "Recepce", lines: ["Kontakt: (doplňte)", "Provozní doba: (doplňte)"] },
-            { title: "Klid", lines: ["Prosíme o klid po 22:00. Děkujeme 🙂"] },
+            { title: "📶 Wi-Fi", lines: ["Síť: RB_Agnes", "Heslo: 76117611.."] },
+            { title: "👨‍💼 Správce", lines: ["Telefon: 603 569 260 (6:00 - 16:00)", "E-mail: info@rychtrovka.cz"] },
+            { title: "🧖 Sauna", lines: ["Saunu zatím máme rozestavěnou, zprovoznění plánujeme na léto"] },
+            { title: "🌙 Noční klid", lines: ["Prosíme o klid po 22:00. Děkujeme 🙂"] },
         ],
     },
     en: {
-        title: "Useful information",
+        title: "Useful Information",
         hint: "Back = Escape / Back",
-        menus: "Menus (PDF)",
+        menus: "Menu (PDF)",
         timetables: "Timetables (PDF)",
         blocks: [
             { title: "📶 Wi-Fi", lines: ["Network: RB_Agnes", "Password: 76117611.."] },
-            { title: "Reception", lines: ["Contact: (fill in)", "Opening hours: (fill in)"] },
-            { title: "Quiet hours", lines: ["Please keep quiet after 10pm. Thank you 🙂"] },
+            { title: "👨‍💼 Manager", lines: ["Phone: +420 603 569 260 (6am - 4pm)", "E-mail: info@rychtrovka.cz"] },
+            { title: "🧖 Sauna", lines: ["The sauna is currently under construction, opening planned for summer"] },
+            { title: "🌙 Quiet Hours", lines: ["Please keep quiet after 10:00 PM. Thank you 🙂"] },
         ],
     },
     de: {
@@ -42,9 +45,10 @@ const copy: Record<Lang, { title: string; blocks: { title: string; lines: string
         menus: "Speisekarten (PDF)",
         timetables: "Fahrpläne (PDF)",
         blocks: [
-            { title: "📶 WLAN", lines: ["Netz: RYCHTROVKA", "Passwort: (eintragen)"] },
-            { title: "Rezeption", lines: ["Kontakt: (eintragen)", "Öffnungszeiten: (eintragen)"] },
-            { title: "Ruhezeit", lines: ["Bitte nach 22:00 Uhr leise sein. Danke 🙂"] },
+            { title: "📶 WLAN", lines: ["Netz: RB_Agnes", "Passwort: 76117611.."] },
+            { title: "👨‍💼 Verwalter", lines: ["Telefon: +420 603 569 260 (6:00 - 16:00)", "E-Mail: info@rychtrovka.cz"] },
+            { title: "🧖 Sauna", lines: ["Die Sauna ist derzeit im Bau, Eröffnung für den Sommer geplant"] },
+            { title: "🌙 Nachtruhe", lines: ["Bitte um Ruhe nach 22:00 Uhr. Danke 🙂"] },
         ],
     },
     pl: {
@@ -53,12 +57,14 @@ const copy: Record<Lang, { title: string; blocks: { title: string; lines: string
         menus: "Menu (PDF)",
         timetables: "Rozkłady jazdy (PDF)",
         blocks: [
-            { title: "📶 Wi-Fi", lines: ["Sieć: RYCHTROVKA", "Hasło: (uzupełnij)"] },
-            { title: "Recepcja", lines: ["Kontakt: (uzupełnij)", "Godziny: (uzupełnij)"] },
-            { title: "Cisza nocna", lines: ["Prosimy o ciszę po 22:00. Dziękujemy 🙂"] },
+            { title: "📶 Wi-Fi", lines: ["Sieć: RB_Agnes", "Hasło: 76117611.."] },
+            { title: "👨‍💼 Zarządca", lines: ["Telefon: +420 603 569 260 (6:00 - 16:00)", "E-mail: info@rychtrovka.cz"] },
+            { title: "🧖 Sauna", lines: ["Sauna jest obecnie w budowie, otwarcie planowane na lato"] },
+            { title: "🌙 Cisza nocna", lines: ["Prosimy o ciszę po 22:00. Dziękujemy 🙂"] },
         ],
     },
 }
+
 
 function getLang(): Lang {
     const v = (typeof window !== "undefined" ? localStorage.getItem("rychtrovka_lang") : null) as Lang | null
@@ -138,7 +144,7 @@ export default function InfoPage() {
             <div style={{ position: "relative", height: "100%", padding: 44, boxSizing: "border-box" }}>
                 {/* HEADER */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 24 }}>
-                    <div style={{ fontSize: 46, fontWeight: 800, fontStyle: "italic", color: "#cc422D", textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
+                    <div style={{ fontSize: 46, fontWeight: 800, fontStyle: "italic", color: "#ff2222", textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
                         ℹ️ {t.title}
                     </div>
                     <div style={{ fontSize: 18, color: "white", opacity: 0.9, textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>{t.hint}</div>
@@ -167,6 +173,7 @@ export default function InfoPage() {
                             display: "flex",
                             flexDirection: "column",
                             gap: 14,
+
                         }}
                     >
                         {t.blocks.map((b) => {
@@ -185,6 +192,7 @@ export default function InfoPage() {
                                         gap: isWifi ? 20 : 0,
                                         alignItems: isWifi ? "center" : "stretch",
                                         justifyContent: "space-between",
+
                                     }}
                                 >
                                     <div style={{ flex: 1 }}>
@@ -206,6 +214,7 @@ export default function InfoPage() {
                                                     fontSize: 20,
                                                     color: "rgba(255,255,255,0.9)",
                                                     lineHeight: 1.25,
+                                                    letterSpacing: "0.1em",
                                                 }}
                                             >
                                                 {ln}
@@ -241,7 +250,7 @@ export default function InfoPage() {
                                 }}
                             >
                                 <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>🍽️ {t.menus}</div>
-                                <div style={{ opacity: 0.9, fontSize: 18 }}>Otevře seznam PDF souborů</div>
+                                <div style={{ opacity: 0.9, fontSize: 18 }}>Otevře seznam. PDF dodávají naši přátelé, nemusí být aktuální.</div>
                             </div>
 
                             <div
@@ -260,7 +269,7 @@ export default function InfoPage() {
                                 }}
                             >
                                 <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>🚌 {t.timetables}</div>
-                                <div style={{ opacity: 0.9, fontSize: 18 }}>Otevře seznam PDF souborů</div>
+                                <div style={{ opacity: 0.9, fontSize: 18 }}>Jízdní řády přebíráme z Portálu dopravy.</div>
                             </div>
                         </div>
 

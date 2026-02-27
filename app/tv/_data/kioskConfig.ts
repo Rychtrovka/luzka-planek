@@ -22,19 +22,19 @@ export const kioskConfig: KioskConfig = {
     },
 
     welcome: {
-        groupName: "Skupina: Lyžaři Benecko",
-        arrival: "2026-02-19",
-        departure: "2026-02-22",
+        groupName: "načítá se...",
+        arrival: "...",
+        departure: "...",
 
         weather: {
-            tempC: -3,
+            tempC: 0.0,
             forecast: [
-                {day: "Dnes", tMin: -6, tMax: -2, label: "sněžení"},
-                {day: "Zítra", tMin: -8, tMax: -1, label: "polojasno"},
-                {day: "So", tMin: -7, tMax: 0, label: "jasno"},
+                {day: "--", tMin: 0, tMax: 0, label: "sněžení"},
+                {day: "--", tMin: 0, tMax: 0, label: "polojasno"},
+                {day: "--", tMin: 0, tMax: 0, label: "jasno"},
             ],
         },
-        messages: []
+        messages: ["načítá se..."]
     },
 
     urls: {

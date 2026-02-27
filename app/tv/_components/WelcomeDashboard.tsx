@@ -54,7 +54,7 @@ type Props = {
 }
 
 function formatDay(dateIso: string) {
-    return dateIso.slice(5) // MM-DD
+    return dateIso // MM-DD
 }
 
 export default function WelcomeDashboard({ t, lang, styles, welcome, messages = [], hotelId }: Props) {
