@@ -51,7 +51,7 @@ export default function MenusPage() {
                 const url = safe[focused]?.url
                 if (url) {
                     setScrollOffset(0) // <--- Resetuj tady
-                    // setSelectedUrl(url)
+                    setSelectedUrl(url)
                 }
             }
         }
@@ -88,7 +88,7 @@ export default function MenusPage() {
                                 <iframe
                                     src={`${selectedUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
                                     style={pageStyles.pdfFrame}
-                                    
+
                                 />
                             </div>
 
