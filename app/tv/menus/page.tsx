@@ -14,9 +14,7 @@ export default function MenusPage() {
     const safe = useMemo(() => items ?? [], [items])
     const max = safe.length
 
-    useEffect(() => {
-        setScrollOffset(0)
-    }, [selectedUrl])
+
 
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
@@ -51,7 +49,10 @@ export default function MenusPage() {
             if (e.key === "Enter" || e.key === "OK" || e.keyCode === 13) {
                 e.preventDefault()
                 const url = safe[focused]?.url
-                if (url) setSelectedUrl(url)
+                if (url) {
+                    setScrollOffset(0) // <--- Resetuj tady
+                    // setSelectedUrl(url)
+                }
             }
         }
         window.addEventListener("keydown", onKey, true)
@@ -100,7 +101,11 @@ export default function MenusPage() {
                             {loading ? <div style={pageStyles.status}>Načítám…</div> : (
                                 <div style={pageStyles.grid}>
                                     {safe.map((it, idx) => (
-                                        <div key={it.id} onClick={() => setSelectedUrl(it.url)}
+                                        <div key={it.id}
+                                             onClick={() => {
+                                                 setScrollOffset(0); // <--- Resetuj tady
+                                                 setSelectedUrl(it.url);
+                                             }}
                                              style={{
                                                  ...pageStyles.item,
                                                  background: idx === focused ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)",
