@@ -60,10 +60,11 @@ export default function MenusPage() {
 
     return (
         <div style={pageStyles.container}>
+            <div style={pageStyles.backgroundLayer} />
             <div style={pageStyles.overlay} />
             <div style={pageStyles.content}>
                 <div style={pageStyles.header}>
-                    <div style={pageStyles.title}>{selectedUrl ? "📄 Detail" : "🍽️ Lístky"}</div>
+                    <div style={pageStyles.title}>{selectedUrl ? "📄 Zde je váš jídelní lístek" : "🍽️ Jídelní lístky námi doporučovaných podniků"}</div>
                     <div style={pageStyles.hint}>{selectedUrl ? "Šipky = Posun | Zpět = Menu" : "Zpět = Escape"}</div>
                 </div>
 
@@ -77,7 +78,11 @@ export default function MenusPage() {
                                 top: scrollOffset,
                                 transition: 'top 0.3s ease-out',
                                 display: 'flex',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                flexDirection: 'column', // Seřadí listy pod sebe
+                                alignItems: 'center',    // Vycentruje papír horizontálně
+                                padding: '20px 0'        // Mezera nahoře a dole
+
                             }}>
                                 <iframe
                                     src={`${selectedUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
@@ -87,7 +92,7 @@ export default function MenusPage() {
                             </div>
 
                             {scrollOffset === 0 && (
-                                <div style={pageStyles.scrollIndicator}>↓ DALŠÍ STRANA</div>
+                                <div style={pageStyles.scrollIndicator}>↓  DALŠÍ LIST</div>
                             )}
                         </div>
                     ) : (
@@ -115,26 +120,69 @@ export default function MenusPage() {
 }
 
 const pageStyles: Record<string, React.CSSProperties> = {
-    container: { height: "100vh", position: "relative", overflow: "hidden", backgroundImage: "url('/media/rychtrovka-illustration.png')", backgroundSize: "cover" },
-    overlay: { position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%)" },
-    content: { position: "relative", height: "100%", padding: 44, display: "flex", flexDirection: "column", zIndex: 1 },
+    container: {
+        height: "100vh",
+        position: "relative",
+        overflow: "hidden",
+        background: "white", // Základní barva, než se načte obrázek
+       // backgroundImage: "url('/media/rychtrovka-illustration.png')",
+    },
+    // Nová vrstva pro samotný obrázek
+    backgroundLayer: {
+        position: "absolute",
+        inset: 0,
+        backgroundImage: "url('/media/rychtrovka-illustration.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        zIndex: 0, // Nejnižší úroveň
+    },
+    overlay: {
+        position: "absolute",
+        inset: 0,
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%)",
+        zIndex: 1 // Nad obrázkem
+    },
+    content: {
+        position: "relative",
+        height: "100%",
+        padding: 44,
+        display: "flex",
+        flexDirection: "column",
+        zIndex: 2 // Bezpečně nad všemi vrstvami pozadí
+    },
+    // ... zbytek stylů zůstává stejný
+
     header: { display: "flex", justifyContent: "space-between", marginBottom: 20 },
-    title: { fontSize: 40, fontWeight: 900, color: "#ff2222" },
-    hint: { fontSize: 18, color: "white", opacity: 0.8 },
-    card: { flex: 1, borderRadius: 24, overflow: "hidden", background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.15)", position: "relative" },
-    viewerWindow: { position: "absolute", inset: 15, overflow: "hidden", borderRadius: 12, background: "#ccc" },
+    title: { fontSize: 50, fontWeight: 900, color: "#ff2222" },
+    hint: { fontSize: 18, color: "white", opacity: 0.9 },
+    card: {
+        flex: 1,
+        borderRadius: 24,
+        overflow: "hidden",
+        background: "rgba(0,0,0,0.1)",
+        border: "1px solid rgba(255,255,255,0.15)",
+        position: "relative"
+    },
+    viewerWindow: {
+        position: "absolute",
+        width: "100%",
+        inset: 15,
+        overflow: "hidden",
+        borderRadius: 12,
+        background: "transparent"
+    },
 
     pdfFrame: {
-        width: "800px",  // Fixní šířka papíru zamezí zvětšení písma
+        width: "600px",  // Fixní šířka papíru zamezí zvětšení písma
         height: "8000px", // Dostatečná výška pro všechny strany pod sebou
         pointerEvents: "none",
-        background: "white",
+        background: "transparent",
         boxShadow: "0 0 40px rgba(0,0,0,0.5)"
     },
 
     gridPadding: { padding: 25, height: "100%" },
     grid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 15 },
-    item: { cursor: "pointer", borderRadius: 18, padding: "18px", color: "white", display: "flex", alignItems: "center", gap: 12 },
-    status: { color: "white", fontSize: 22, textAlign: "center", marginTop: 50 },
+    item: { cursor: "pointer", fontSize: 25, borderRadius: 18, padding: "18px", color: "white", display: "flex", alignItems: "center", gap: 12 },
+    status: { color: "white", fontSize: 30, textAlign: "center", marginTop: 50 },
     scrollIndicator: { position: "absolute", bottom: 20, right: 20, background: "#ff2222", color: "white", padding: "10px 20px", borderRadius: 30, fontWeight: "bold", zIndex: 10, boxShadow: "0 5px 15px rgba(0,0,0,0.3)" }
 }
