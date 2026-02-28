@@ -25,8 +25,8 @@ export const viewport: Viewport = {
 
 // Metadata včetně cesty k ikoně
 export const metadata: Metadata = {
-  title: "Rychtrovka TV",
-  description: "Hotel kiosk TV",
+  title: "RychterIS TV",
+  description: "Rychtrovka - kiosk TV",
   icons: {
     icon: "/favicon.ico", // Ujisti se, že soubor je v public/favicon.ico
   },

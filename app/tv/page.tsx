@@ -16,9 +16,6 @@ import WelcomeDashboard from "./_components/WelcomeDashboard"
 import MenuScreen from "./_components/MenuScreen"
 import DetailScreen from "./_components/DetailScreen"
 import VideoScreen, {VideoKey} from "./_components/VideoScreen"
-
-
-
 // Pomocné funkce mimo komponentu pro čistší tělo
 const formatTime = (sec: number) => {
   const s = Math.max(0, Math.floor(sec || 0))
@@ -57,12 +54,7 @@ export default function TVPage() {
     timezone: kioskConfig.location.timezone,
   })
 
-/*
-  const { messages } = useWelcomeMessages(
-      kioskConfig.hotelId,
-      kioskConfig.welcome.messages
-  )
-    */
+
 
   // --- MEMOIZED DATA ---
   // Transformace dat počasí, aby se nepřepočítávala při každém renderu
@@ -128,6 +120,7 @@ export default function TVPage() {
                 welcome={welcomeData}
                 //messages={messages}
             />
+
         )
       case "MENU":
         return (
@@ -168,11 +161,25 @@ export default function TVPage() {
   }
 
   return (
+      <div style={styles.wrapper}>
+          {/* Logo je nyní sourozencem kontejneru, ale uvnitř wrapperu */}
+          <img
+              src="/media/RychterIS_final.png"
+              alt="Logo"
+              style={styles.logo}
+              width="180"
+          />
+
       <main style={styles.container}>
+
         <div style={styles.overlay} />
+
         <div style={styles.content}>
           {renderScreen()}
         </div>
+
       </main>
+      </div>
+
   )
 }

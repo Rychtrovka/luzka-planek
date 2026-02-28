@@ -27,6 +27,12 @@ export default function WeatherPage() {
 
   return (
     <div style={styles.container}>
+      <img
+          src="/media/RychterIS_final.png"
+          alt="Logo"
+          style={styles.logo}
+          width="180"
+      />
       <div style={styles.overlay} />
 
       <div style={styles.content}>
@@ -128,6 +134,14 @@ frame: {
     color: "white",
     textShadow: "0 4px 20px rgba(0,0,0,0.8)",
     whiteSpace: "nowrap",
+  },
+  logo: {
+    position: "absolute" as const,
+    top: 10,
+    right: 10,
+    zIndex: 9999,
+    pointerEvents: "none" as const,
+    filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
   },
 
   

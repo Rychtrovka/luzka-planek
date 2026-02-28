@@ -59,6 +59,12 @@ export default function TimetablesPage() {
 
     return (
         <div style={pageStyles.container}>
+            <img
+                src="/media/RychterIS_final.png"
+                alt="Logo"
+                style={pageStyles.logo}
+                width="180"
+            />
             <div style={pageStyles.backgroundLayer} />
             <div style={pageStyles.overlay} />
             <div style={pageStyles.content}>
@@ -125,6 +131,7 @@ export default function TimetablesPage() {
 
 const pageStyles: Record<string, React.CSSProperties> = {
     container: { height: "100vh", position: "relative", overflow: "hidden", background: "white" },
+
     backgroundLayer: {
         position: "absolute",
         inset: 0,
@@ -159,6 +166,14 @@ const pageStyles: Record<string, React.CSSProperties> = {
         borderRadius: 12,
         background: "transparent"
     },
+logo: {
+    position: "absolute" as const,
+        top: 10,
+        right: 10,
+        zIndex: 9999,
+        pointerEvents: "none" as const,
+        filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
+},
     pdfFrame: {
         width: "1200px",
         height: "8000px",

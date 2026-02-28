@@ -22,6 +22,7 @@ export default function TVPage() {
 
   return (
     <div style={styles.container}>
+
       {screen === "WELCOME" && (
         <div>
           <h1 style={styles.title}>Vítejte na Rychtrově boudě</h1>
@@ -32,6 +33,7 @@ export default function TVPage() {
       {screen === "MENU" && (
         <div>
           <h1 style={styles.title}>MENU</h1>
+
           <p>Escape = zpět</p>
         </div>
       )}
@@ -48,11 +50,12 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
-    fontFamily: "sans-serif"
+    fontFamily: "sans-serif",
   },
   title: {
     fontSize: "60px",
     marginBottom: "20px"
   }
+
 }
 

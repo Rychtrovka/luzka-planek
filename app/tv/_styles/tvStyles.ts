@@ -9,6 +9,14 @@ export
     overflow: "hidden",
     position: "relative",
   },
+
+  // Nový obalový prvek (Wrapper)
+  wrapper: {
+    position: "relative" as const,
+    width: "100vw",
+    height: "100vh",
+    overflow: "hidden",
+  },
   
   container: {
     width: "100%",
@@ -16,15 +24,22 @@ export
     position: "relative" as const,
     overflow: "hidden",
     fontFamily: "inherit",
-   // color: "#cc422D",
     color: "#ff2222",
-
-    // ? background only once here:
     backgroundImage: "url('/media/rychtrovka-illustration.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center bottom",
-    backgroundRepeat: "no-repeat",
+    backgroundSize: " cover",
+    backgroundPosition: " center bottom",
+    backgroundRepeat: " no-repeat",
   },
+
+  logo: {
+    position: "absolute" as const,
+    top: 10,
+    right: 10,
+    zIndex: 9999,
+    pointerEvents: "none" as const,
+    filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
+  },
+
 
   overlay : {
     position: "absolute" as const,

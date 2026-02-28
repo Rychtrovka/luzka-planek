@@ -61,6 +61,12 @@ export default function MenusPage() {
 
     return (
         <div style={pageStyles.container}>
+            <img
+                src="/media/RychterIS_final.png"
+                alt="Logo"
+                style={pageStyles.logo}
+                width="180"
+            />
             <div style={pageStyles.backgroundLayer} />
             <div style={pageStyles.overlay} />
             <div style={pageStyles.content}>
@@ -131,6 +137,15 @@ const pageStyles: Record<string, React.CSSProperties> = {
         overflow: "hidden",
         background: "white", // Základní barva, než se načte obrázek
        // backgroundImage: "url('/media/rychtrovka-illustration.png')",
+    },
+
+    logo: {
+        position: "absolute" as const,
+        top: 10,
+        right: 10,
+        zIndex: 9999,
+        pointerEvents: "none" as const,
+        filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
     },
     // Nová vrstva pro samotný obrázek
     backgroundLayer: {
