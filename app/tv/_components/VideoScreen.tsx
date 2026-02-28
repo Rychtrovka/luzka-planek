@@ -23,11 +23,11 @@ export default function VideoScreen({
 
     const rawUrl = (videoKey && videos[videoKey]) ? videos[videoKey].url : "";
     const cleanFileName = rawUrl
-        .replace("https://tv.rychtrovka.cz", "")
-        .replace("http://tv.rychtrovka.cz", "")
-        .replace("tv.rychtrovka.cz/media/", "");
+        .replace("https://video.rychtrovka.cz", "")
+        .replace("http://video.rychtrovka.cz", "")
+        .replace("video.rychtrovka.cz/", "");
 
-    const finalVideoSrc = cleanFileName ? "http://tv.rychtrovka.cz" + cleanFileName : "";
+    const finalVideoSrc = cleanFileName ? "http://video.rychtrovka.cz" + cleanFileName : "";
 
     // Definice stylu pro video, aby nepřetékalo
     const videoStyle: CSSProperties = {
