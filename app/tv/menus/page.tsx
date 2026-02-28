@@ -88,7 +88,7 @@ export default function MenusPage() {
                                 <iframe
                                     src={`${selectedUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
                                     style={pageStyles.pdfFrame}
-                                    frameBorder="0"
+                                    
                                 />
                             </div>
 
