@@ -50,8 +50,8 @@ export default function MenusPage() {
                 e.preventDefault()
                 const url = safe[focused]?.url
                 if (url) {
-                    setScrollOffset(0) // <--- Resetuj tady
-                    setSelectedUrl(url)
+                    setScrollOffset(0)
+                    setSelectedUrl(`/pdf?url=${encodeURIComponent(url)}`)
                 }
             }
         }
@@ -92,10 +92,10 @@ export default function MenusPage() {
 
                             }}>
                                 <iframe
-                                    src={`https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(selectedUrl)}`}
+                                    src={selectedUrl}
                                     style={pageStyles.pdfFrame}
                                     allow="fullscreen"
-                                />
+                                />pdfFr
                             </div>
 
                             {scrollOffset === 0 && (
@@ -110,7 +110,7 @@ export default function MenusPage() {
                                         <div key={it.id}
                                              onClick={() => {
                                                  setScrollOffset(0); // <--- Resetuj tady
-                                                 setSelectedUrl(it.url);
+                                                 setSelectedUrl(`/pdf?url=${encodeURIComponent(it.url)}`);
                                              }}
                                              style={{
                                                  ...pageStyles.item,
@@ -193,9 +193,9 @@ const pageStyles: Record<string, React.CSSProperties> = {
     },
 
     pdfFrame: {
-        width: "600px",  // Fixní šířka papíru zamezí zvětšení písma
-        height: "8000px", // Dostatečná výška pro všechny strany pod sebou
-        pointerEvents: "none",
+        width: "100%",
+        height: "100%",
+        border: "none",
         background: "transparent",
         boxShadow: "0 0 40px rgba(0,0,0,0.5)"
     },
