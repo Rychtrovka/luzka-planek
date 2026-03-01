@@ -33,6 +33,12 @@ export default function BeerPage() {
 
     return (
         <div style={pageStyles.container}>
+            <img
+                src="/media/RychterIS_final.png"
+                alt="Logo"
+                style={pageStyles.logo}
+                width="180"
+            />
             <div style={pageStyles.overlay} />
 
             <div style={pageStyles.header}>
@@ -63,7 +69,12 @@ export default function BeerPage() {
             </div>
 
             <div style={pageStyles.content}>
-                <div style={{...pageStyles.frameCard, width: "70%"}}> {/* Zúžení zde */}
+                <div style=
+                         {{...pageStyles.frameCard,
+                             width: "40%",
+                             backgroundColor: "rgba(0, 0, 0, 0.2)",
+                         }}
+                > {/* Zúžení zde */}
 
                     {/* Podmíněný štít */}
                     {isLocked && (
@@ -177,4 +188,12 @@ const pageStyles: Record<string, React.CSSProperties> = {
         display: "block",
         background: "transparent",
     },
+    logo: {
+        position: "absolute" as const,
+        top: 10,
+        right: 10,
+        zIndex: 9999,
+        pointerEvents: "none" as const,
+        filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
+    }
 }

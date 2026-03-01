@@ -27,7 +27,7 @@ export default function VideoScreen({
         .replace("http://video.rychtrovka.cz", "")
         .replace("video.rychtrovka.cz/", "");
 
-    const finalVideoSrc = cleanFileName ? "http://video.rychtrovka.cz" + cleanFileName : "";
+    const finalVideoSrc = cleanFileName ? "https://video.rychtrovka.cz" + cleanFileName : "";
 
     // Definice stylu pro video, aby nepřetékalo
     const videoStyle: CSSProperties = {
