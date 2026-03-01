@@ -92,9 +92,9 @@ export default function MenusPage() {
 
                             }}>
                                 <iframe
-                                    src={`${selectedUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
+                                    src={`https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(selectedUrl)}`}
                                     style={pageStyles.pdfFrame}
-
+                                    allow="fullscreen"
                                 />
                             </div>
 
