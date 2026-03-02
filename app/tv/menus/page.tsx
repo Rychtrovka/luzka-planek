@@ -81,7 +81,7 @@ export default function MenusPage() {
                         {selectedUrl ? "📄 Zde je váš jídelní lístek" : "🍽️ Jídelní lístky námi doporučovaných podniků"}
                     </div>
                     <div style={pageStyles.hint}>
-                        {selectedUrl ? "←/→ stránka • +/- zoom • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Escape"}
+                        {selectedUrl ? "←/→ stránka  • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Escape"}
                     </div>
                 </div>
 
@@ -173,7 +173,8 @@ const pageStyles: Record<string, React.CSSProperties> = {
         flex: 1,
         borderRadius: 24,
         overflow: "hidden",
-        background: "rgba(0,0,0,0.1)",
+       // background: "rgba(0,0,0,0.1)",
+        background:"transparent",
         border: "1px solid rgba(255,255,255,0.15)",
         position: "relative",
     },
