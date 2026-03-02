@@ -157,7 +157,7 @@ export default function PdfPage() {
             style={{
                 width: "100vw",
                 height: "100vh",
-                background: "#000",
+                background: "transparent",
                 color: "#fff",
                 display: "flex",
                 justifyContent: "center",
