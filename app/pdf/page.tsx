@@ -134,6 +134,12 @@ export default function PdfPage() {
                 canvas.width = Math.floor(viewport.width * dpr);
                 canvas.height = Math.floor(viewport.height * dpr);
 
+
+
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+// vrať transform pro kreslení PDF
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
                 await page.render({ canvasContext: ctx, viewport } as any).promise;
@@ -153,7 +159,10 @@ export default function PdfPage() {
     }, [pdfUrl, pageNum, zoom, resizeTick]);
 
     return (
+
         <div
+
+
             style={{
                 width: "100vw",
                 height: "100vh",
@@ -166,6 +175,9 @@ export default function PdfPage() {
                 position: "relative",
             }}
         >
+            <style jsx global>{`
+  html, body { background: transparent !important; }
+`}</style>
             {err ? (
                 <div style={{ padding: 24, fontSize: 24 }}>{err}</div>
             ) : (
