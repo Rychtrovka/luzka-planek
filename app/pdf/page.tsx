@@ -69,7 +69,12 @@ export default function PdfPage() {
                 // worker z public
                 pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
 
-                const task = pdfjs.getDocument({ url: pdfUrl });
+                const task = pdfjs.getDocument({
+                    url: pdfUrl,
+                    disableRange: true,
+                    disableStream: true,
+                    disableAutoFetch: true,
+                });
                 const pdf = await task.promise;
                 if (cancelled) return;
 
