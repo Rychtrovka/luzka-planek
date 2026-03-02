@@ -1,10 +1,10 @@
-﻿import React from 'react';
+﻿import React, { useEffect } from "react";
 import { CSSProperties } from "react";
 
 export type VideoKey = "story" | "guide" | null;
 
 interface VideoScreenProps {
-    t: { tiles: Record<string, string>; videoHint: string; };
+    t: { tiles: Record<string, string>; videoHint: string };
     styles: Record<string, CSSProperties>;
     videoKey: VideoKey;
     videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -15,37 +15,77 @@ interface VideoScreenProps {
     setVideoTime: (time: number) => void;
     setVideoDuration: (time: number) => void;
     onEnded: () => void;
+    onBack: () => void;   // 👈 důležité
 }
 
 export default function VideoScreen({
-                                        t, styles, videoKey, videoRef, videos, videoTime, videoDuration, formatTime, setVideoTime, setVideoDuration, onEnded,
+                                        t,
+                                        styles,
+                                        videoKey,
+                                        videoRef,
+                                        videos,
+                                        videoTime,
+                                        videoDuration,
+                                        formatTime,
+                                        setVideoTime,
+                                        setVideoDuration,
+                                        onEnded,
+                                        onBack,
                                     }: VideoScreenProps) {
 
+    // 🔹 BACK handler (TV + klávesnice)
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            const isBack =
+                e.key === "Escape" ||
+                e.key === "Backspace" ||
+                e.key === "BrowserBack" ||
+                e.key === "Back" ||
+                e.keyCode === 27 ||
+                e.keyCode === 8 ||
+                e.keyCode === 166;
+
+            if (isBack) {
+                e.preventDefault();
+                e.stopPropagation();
+                onBack();        // 👈 zavře video
+            }
+        };
+
+        window.addEventListener("keydown", onKeyDown, true); // capture kvůli TV focusu
+        return () => window.removeEventListener("keydown", onKeyDown, true);
+    }, [onBack]);
+
     const rawUrl = (videoKey && videos[videoKey]) ? videos[videoKey].url : "";
+
     const cleanFileName = rawUrl
         .replace("https://video.rychtrovka.cz", "")
         .replace("http://video.rychtrovka.cz", "")
         .replace("video.rychtrovka.cz/", "");
 
-    const finalVideoSrc = cleanFileName ? "https://video.rychtrovka.cz" + cleanFileName : "";
+    const finalVideoSrc = cleanFileName
+        ? "https://video.rychtrovka.cz" + cleanFileName
+        : "";
 
-    // Definice stylu pro video, aby nepřetékalo
     const videoStyle: CSSProperties = {
-        ...styles.video,       // Zachováme původní styly (barvy, stíny...)
-        maxWidth: '90%',       // Video zabere max 90% šířky kontejneru
-        maxHeight: '80vh',     // Video zabere max 70% výšky obrazovky
-        margin: '0 auto',      // Vycentrování
-        display: 'block',
-        objectFit: 'contain'   // ZAJISTÍ, ŽE SE VIDEO VEJDE A NEBUDE OŘEZANÉ
+        ...styles.video,
+        maxWidth: "90%",
+        maxHeight: "80vh",
+        margin: "0 auto",
+        display: "block",
+        objectFit: "contain",
     };
 
     return (
-        <div style={styles.videoPage}>
-            {/* Diagnostický řádek - klidně smaž, pokud už vše sedí */}
-            <div style={{ position: 'absolute', top: 0, color: '#0f0', fontSize: '10px' }}>URL: {finalVideoSrc}</div>
-
+        <div
+            style={styles.videoPage}
+            tabIndex={0}                 // 👈 aby měl wrapper focus
+            ref={(el) => el?.focus()}    // 👈 focus na mount
+        >
             <div style={styles.videoHeader}>
-                <div style={styles.videoTitle}>{videoKey ? t.tiles[videoKey] : ""}</div>
+                <div style={styles.videoTitle}>
+                    {videoKey ? t.tiles[videoKey] : ""}
+                </div>
                 <div style={styles.videoHint}>{t.videoHint}</div>
             </div>
 
@@ -54,30 +94,44 @@ export default function VideoScreen({
                     key={finalVideoSrc}
                     ref={videoRef}
                     src={finalVideoSrc}
-                    style={videoStyle} // Používáme náš nový omezující styl
+                    style={videoStyle}
                     controls={false}
                     playsInline
-                    /* muted odstraněno pro zvuk - pamatuj na nutnost kliknutí uživatele pro start */
                     autoPlay
                     preload="auto"
-                    onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime || 0)}
+                    onTimeUpdate={(e) =>
+                        setVideoTime(e.currentTarget.currentTime || 0)
+                    }
                     onLoadedMetadata={(e) => {
                         setVideoDuration(e.currentTarget.duration || 0);
-                        e.currentTarget.volume = 1.0; // Vynucení plné hlasitosti
+                        e.currentTarget.volume = 1.0;
                     }}
                     onEnded={onEnded}
                 />
 
                 <div style={styles.progressOverlay}>
                     <div style={styles.progressRow}>
-                        <div style={styles.timeText}>{formatTime(videoTime)}</div>
-                        <div style={styles.timeText}>{formatTime(videoDuration)}</div>
+                        <div style={styles.timeText}>
+                            {formatTime(videoTime)}
+                        </div>
+                        <div style={styles.timeText}>
+                            {formatTime(videoDuration)}
+                        </div>
                     </div>
+
                     <div style={styles.progressTrack}>
-                        <div style={{
-                            ...styles.progressFill,
-                            width: videoDuration > 0 ? (Math.min(100, (videoTime / videoDuration) * 100) + "%") : "0%",
-                        }} />
+                        <div
+                            style={{
+                                ...styles.progressFill,
+                                width:
+                                    videoDuration > 0
+                                        ? Math.min(
+                                        100,
+                                        (videoTime / videoDuration) * 100
+                                    ) + "%"
+                                        : "0%",
+                            }}
+                        />
                     </div>
                 </div>
             </div>
