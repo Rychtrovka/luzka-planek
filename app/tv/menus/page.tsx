@@ -37,12 +37,11 @@ export default function MenusPage() {
 
             if (isBack) {
                 e.preventDefault();
-
+                e.stopPropagation();
                 // když je otevřený PDF viewer v iframe, zavři ho v rámci UI
                 if (selectedUrl) {
                     setSelectedUrl(null);
                 }
-
                 // jinak NIC – back vyřeší Android (onBackPressed -> web.goBack / kiosk)
                 return;
             }
@@ -65,8 +64,8 @@ export default function MenusPage() {
             }
         };
 
-        window.addEventListener("keydown", onKey, true);
-        return () => window.removeEventListener("keydown", onKey, true);
+        window.addEventListener("keydown", onKey, false);
+        return () => window.removeEventListener("keydown", onKey, false);
     }, [focused, max, safe, selectedUrl]);
 
     return (
