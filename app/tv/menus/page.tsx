@@ -188,7 +188,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
     },
 
     pdfFrame: {
-        width: "100%",
+        width: "50%",
         height: "100%",
         border: "none",
         background: "transparent",
