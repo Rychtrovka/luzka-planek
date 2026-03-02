@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { kioskConfig } from "../_data/kioskConfig";
 import { usePdfList } from "../_hooks/usePdfList";
 
@@ -8,9 +8,22 @@ export default function MenusPage() {
     const { items, loading } = usePdfList(kioskConfig.hotelId, "pdfMenus");
     const [focused, setFocused] = useState(0);
 
+    // selectedUrl je URL na interní /pdf viewer (ne přímo PDF)
+    const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+
     const cols = 3;
     const safe = useMemo(() => items ?? [], [items]);
     const max = safe.length;
+
+    const viewerRef = useRef<HTMLDivElement | null>(null);
+
+    const openPdf = (pdfDirectUrl: string) => {
+        const r = viewerRef.current?.getBoundingClientRect();
+        const w = r ? Math.round(r.width) : 1200;
+        const h = r ? Math.round(r.height) : 700;
+
+        setSelectedUrl(`/pdf?url=${encodeURIComponent(pdfDirectUrl)}&w=${w}&h=${h}`);
+    };
 
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
@@ -24,9 +37,14 @@ export default function MenusPage() {
 
             if (isBack) {
                 e.preventDefault();
-                window.history.back();
+                if (selectedUrl) setSelectedUrl(null);
+                else window.history.back();
                 return;
             }
+
+            // Když je otevřené PDF, šipky necháváme na /pdf viewer (iframe).
+            // MenusPage jen neřeší navigaci v gridu.
+            if (selectedUrl) return;
 
             if (!max) return;
 
@@ -38,16 +56,13 @@ export default function MenusPage() {
             if (e.key === "Enter" || e.key === "OK" || e.keyCode === 13) {
                 e.preventDefault();
                 const url = safe[focused]?.url;
-                if (url) {
-                    // ✅ otevři PDF viewer fullscreen (ne iframe)
-                    window.location.href = `/pdf?url=${encodeURIComponent(url)}`;
-                }
+                if (url) openPdf(url);
             }
         };
 
         window.addEventListener("keydown", onKey, true);
         return () => window.removeEventListener("keydown", onKey, true);
-    }, [focused, max, safe]);
+    }, [focused, max, safe, selectedUrl]);
 
     return (
         <div style={pageStyles.container}>
@@ -63,39 +78,45 @@ export default function MenusPage() {
             <div style={pageStyles.content}>
                 <div style={pageStyles.header}>
                     <div style={pageStyles.title}>
-                        🍽️ Jídelní lístky námi doporučovaných podniků
+                        {selectedUrl ? "📄 Zde je váš jídelní lístek" : "🍽️ Jídelní lístky námi doporučovaných podniků"}
                     </div>
-                    <div style={pageStyles.hint}>OK = otevřít • Zpět = Escape/Back</div>
+                    <div style={pageStyles.hint}>
+                        {selectedUrl ? "←/→ stránka • +/- zoom • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Escape"}
+                    </div>
                 </div>
 
                 <div style={pageStyles.card}>
-                    <div style={pageStyles.gridPadding}>
-                        {loading ? (
-                            <div style={pageStyles.status}>Načítám…</div>
-                        ) : (
-                            <div style={pageStyles.grid}>
-                                {safe.map((it, idx) => (
-                                    <div
-                                        key={it.id}
-                                        onClick={() => {
-                                            window.location.href = `/pdf?url=${encodeURIComponent(it.url)}`;
-                                        }}
-                                        style={{
-                                            ...pageStyles.item,
-                                            background:
-                                                idx === focused ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)",
-                                            border:
-                                                idx === focused
-                                                    ? "3px solid #ff2222"
-                                                    : "1px solid rgba(255,255,255,0.1)",
-                                        }}
-                                    >
-                                        📄 {it.title}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    {selectedUrl ? (
+                        <div style={pageStyles.viewerWindow} ref={viewerRef}>
+                            <iframe
+                                src={selectedUrl}
+                                style={pageStyles.pdfFrame}
+                                allow="fullscreen"
+                            />
+                        </div>
+                    ) : (
+                        <div style={pageStyles.gridPadding} ref={viewerRef}>
+                            {loading ? (
+                                <div style={pageStyles.status}>Načítám…</div>
+                            ) : (
+                                <div style={pageStyles.grid}>
+                                    {safe.map((it, idx) => (
+                                        <div
+                                            key={it.id}
+                                            onClick={() => openPdf(it.url)}
+                                            style={{
+                                                ...pageStyles.item,
+                                                background: idx === focused ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)",
+                                                border: idx === focused ? "3px solid #ff2222" : "1px solid rgba(255,255,255,0.1)",
+                                            }}
+                                        >
+                                            📄 {it.title}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -109,6 +130,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
         overflow: "hidden",
         background: "white",
     },
+
     logo: {
         position: "absolute" as const,
         top: 10,
@@ -117,6 +139,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
         pointerEvents: "none" as const,
         filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
     },
+
     backgroundLayer: {
         position: "absolute",
         inset: 0,
@@ -125,13 +148,14 @@ const pageStyles: Record<string, React.CSSProperties> = {
         backgroundPosition: "center",
         zIndex: 0,
     },
+
     overlay: {
         position: "absolute",
         inset: 0,
-        background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%)",
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%)",
         zIndex: 1,
     },
+
     content: {
         position: "relative",
         height: "100%",
@@ -140,9 +164,11 @@ const pageStyles: Record<string, React.CSSProperties> = {
         flexDirection: "column",
         zIndex: 2,
     },
+
     header: { display: "flex", justifyContent: "space-between", marginBottom: 20 },
     title: { fontSize: 50, fontWeight: 900, color: "#ff2222" },
     hint: { fontSize: 18, color: "white", opacity: 0.9 },
+
     card: {
         flex: 1,
         borderRadius: 24,
@@ -151,6 +177,24 @@ const pageStyles: Record<string, React.CSSProperties> = {
         border: "1px solid rgba(255,255,255,0.15)",
         position: "relative",
     },
+
+    viewerWindow: {
+        position: "absolute",
+        width: "100%",
+        inset: 15,
+        overflow: "hidden",
+        borderRadius: 12,
+        background: "transparent",
+    },
+
+    pdfFrame: {
+        width: "100%",
+        height: "100%",
+        border: "none",
+        background: "transparent",
+        boxShadow: "0 0 40px rgba(0,0,0,0.5)",
+    },
+
     gridPadding: { padding: 25, height: "100%" },
     grid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 15 },
     item: {
@@ -163,5 +207,6 @@ const pageStyles: Record<string, React.CSSProperties> = {
         alignItems: "center",
         gap: 12,
     },
+
     status: { color: "white", fontSize: 30, textAlign: "center", marginTop: 50 },
 };
