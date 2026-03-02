@@ -15,7 +15,7 @@ interface VideoScreenProps {
     setVideoTime: (time: number) => void;
     setVideoDuration: (time: number) => void;
     onEnded: () => void;
-    onBack: () => void;   // 👈 důležité
+
 }
 
 export default function VideoScreen({
@@ -30,31 +30,9 @@ export default function VideoScreen({
                                         setVideoTime,
                                         setVideoDuration,
                                         onEnded,
-                                        onBack,
+
                                     }: VideoScreenProps) {
 
-    // 🔹 BACK handler (TV + klávesnice)
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => {
-            const isBack =
-                e.key === "Escape" ||
-                e.key === "Backspace" ||
-                e.key === "BrowserBack" ||
-                e.key === "Back" ||
-                e.keyCode === 27 ||
-                e.keyCode === 8 ||
-                e.keyCode === 166;
-
-            if (isBack) {
-                e.preventDefault();
-                e.stopPropagation();
-                onBack();        // 👈 zavře video
-            }
-        };
-
-        window.addEventListener("keydown", onKeyDown, true); // capture kvůli TV focusu
-        return () => window.removeEventListener("keydown", onKeyDown, true);
-    }, [onBack]);
 
     const rawUrl = (videoKey && videos[videoKey]) ? videos[videoKey].url : "";
 
