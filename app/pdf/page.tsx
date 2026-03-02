@@ -120,21 +120,28 @@ export default function PdfPage() {
     }, [numPages]);
 
     return (
-        <div style={{ width: "100vw", height: "100vh", background: "#000", color: "#fff", display: "flex", flexDirection: "column" }}>
-            <div style={{ padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>PDF</div>
-                <div style={{ fontSize: 16 }}>
-                    {err ? "Chyba" : loading ? "Načítám…" : `Strana ${pageNum}/${numPages}`} | Zoom {Math.round(scale * 100)}%
-                </div>
-            </div>
-
-            <div style={{ flex: 1, overflow: "auto", display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
-                {err ? <div style={{ padding: 24 }}>{err}</div> : <canvas ref={canvasRef} />}
-            </div>
-
-            <div style={{ padding: "10px 16px", fontSize: 16, opacity: 0.9 }}>
-                ←/→ stránka • +/- zoom • BACK návrat
-            </div>
+        <div
+            style={{
+                width: "100vw",
+                height: "100vh",
+                background: "#000",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+        >
+            {err ? (
+                <div style={{ color: "#fff", fontSize: 24 }}>{err}</div>
+            ) : (
+                <canvas
+                    ref={canvasRef}
+                    style={{
+                        maxWidth: "100vw",
+                        maxHeight: "100vh",
+                        objectFit: "contain"
+                    }}
+                />
+            )}
         </div>
     );
 }
