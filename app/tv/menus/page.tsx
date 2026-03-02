@@ -91,7 +91,7 @@ export default function MenusPage() {
                             <iframe
                                 src={selectedUrl}
                                 style={pageStyles.pdfFrame}
-                                allow="fullscreen"
+                                //allow="fullscreen"
                             />
                         </div>
                     ) : (
