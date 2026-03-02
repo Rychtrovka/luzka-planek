@@ -199,7 +199,7 @@ export default function PdfPage() {
                     opacity: 0.95,
                 }}
             >
-                {loading ? "Načítám…" : `${pageNum}/${numPages}`} &nbsp;|&nbsp; zoom {Math.round(zoom * 100)}%
+                {loading ? "Načítám z databáze… Chvilku strpení" : `Stránka ${pageNum}/${numPages}`}
             </div>
         </div>
     );

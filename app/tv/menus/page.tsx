@@ -37,8 +37,13 @@ export default function MenusPage() {
 
             if (isBack) {
                 e.preventDefault();
-                if (selectedUrl) setSelectedUrl(null);
-                else window.history.back();
+
+                // když je otevřený PDF viewer v iframe, zavři ho v rámci UI
+                if (selectedUrl) {
+                    setSelectedUrl(null);
+                }
+
+                // jinak NIC – back vyřeší Android (onBackPressed -> web.goBack / kiosk)
                 return;
             }
 
