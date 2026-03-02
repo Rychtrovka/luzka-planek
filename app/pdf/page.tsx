@@ -4,8 +4,6 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type PdfJsModule = typeof import("pdfjs-dist");
-
 export default function PdfPage() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -36,11 +34,9 @@ export default function PdfPage() {
                 setErr(null);
                 setLoading(true);
 
-                // ✅ pdfjs načítáme až na klientu (server se ho nedotkne)
-                const pdfjs: PdfJsModule = await import("pdfjs-dist");
-
-                // worker z /public
-                (pdfjs as any).GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+                // ✅ legacy build (kompatibilnější s TV WebView)
+                const pdfjs = await import("pdfjs-dist/legacy/build/pdf");
+                (pdfjs as any).GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 
                 const task = (pdfjs as any).getDocument({ url: pdfUrl });
                 const pdf = await task.promise;
@@ -79,22 +75,10 @@ export default function PdfPage() {
 
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "ArrowLeft") {
-                e.preventDefault();
-                setPageNum((p) => Math.max(1, p - 1));
-            }
-            if (e.key === "ArrowRight") {
-                e.preventDefault();
-                setPageNum((p) => Math.min(numPages, p + 1));
-            }
-            if (e.key === "+" || e.key === "=") {
-                e.preventDefault();
-                setScale((s) => Math.min(3.0, Number((s + 0.2).toFixed(2))));
-            }
-            if (e.key === "-" || e.key === "_") {
-                e.preventDefault();
-                setScale((s) => Math.max(0.8, Number((s - 0.2).toFixed(2))));
-            }
+            if (e.key === "ArrowLeft") { e.preventDefault(); setPageNum(p => Math.max(1, p - 1)); }
+            if (e.key === "ArrowRight") { e.preventDefault(); setPageNum(p => Math.min(numPages, p + 1)); }
+            if (e.key === "+" || e.key === "=") { e.preventDefault(); setScale(s => Math.min(3.0, Number((s + 0.2).toFixed(2)))); }
+            if (e.key === "-" || e.key === "_") { e.preventDefault(); setScale(s => Math.max(0.8, Number((s - 0.2).toFixed(2)))); }
         };
 
         window.addEventListener("keydown", onKeyDown, true);
