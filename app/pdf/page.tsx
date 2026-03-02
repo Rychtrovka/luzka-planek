@@ -35,7 +35,7 @@ export default function PdfPage() {
                 setLoading(true);
 
                 // ✅ legacy WEB build (bez node "canvas" require)
-                const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+                const pdfjs = await import("pdfjs-dist/legacy/build/pdf.js");
                 (pdfjs as any).GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 
                 const task = (pdfjs as any).getDocument({ url: pdfUrl });
