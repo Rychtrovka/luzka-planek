@@ -38,13 +38,37 @@ export default function PdfPage() {
 
     const [pageNum, setPageNum] = useState(1);
     const [numPages, setNumPages] = useState(1);
-    const [scale, setScale] = useState(1.6);
+
+    // zoom multiplier relative to "fit-to-screen"
+    const [zoom, setZoom] = useState(1.0);
+
+    // refresh render on resize (TV/rotation/UI changes)
+    const [resizeTick, setResizeTick] = useState(0);
 
     const pdfUrl = useMemo(() => {
         if (typeof window === "undefined") return "";
         const u = new URL(window.location.href);
         return u.searchParams.get("url") ?? "";
     }, []);
+
+    useEffect(() => {
+        const onResize = () => setResizeTick((t) => t + 1);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowLeft") { e.preventDefault(); setPageNum((p) => Math.max(1, p - 1)); }
+            if (e.key === "ArrowRight") { e.preventDefault(); setPageNum((p) => Math.min(numPages, p + 1)); }
+
+            if (e.key === "+" || e.key === "=") { e.preventDefault(); setZoom((z) => Math.min(3.0, Number((z + 0.2).toFixed(2)))); }
+            if (e.key === "-" || e.key === "_") { e.preventDefault(); setZoom((z) => Math.max(0.6, Number((z - 0.2).toFixed(2)))); }
+        };
+
+        window.addEventListener("keydown", onKeyDown, true);
+        return () => window.removeEventListener("keydown", onKeyDown, true);
+    }, [numPages]);
 
     useEffect(() => {
         if (!pdfUrl) {
@@ -60,21 +84,21 @@ export default function PdfPage() {
                 setErr(null);
                 setLoading(true);
 
-                // ✅ načti pdfjs jako statický script (bez bundleru)
                 await loadScript("/pdfjs/pdf.min.js");
 
                 const pdfjs = window.pdfjsLib;
-                if (!pdfjs) throw new Error("pdfjsLib nenalezeno (script se nenačetl?)");
+                if (!pdfjs) throw new Error("pdfjsLib nenalezeno (nenačetl se /pdfjs/pdf.min.js?)");
 
-                // worker z public
                 pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
 
+                // ✅ často pomáhá v TV WebView: stáhnout celé bez range (můžeš vypnout, když CORS už máš OK)
                 const task = pdfjs.getDocument({
                     url: pdfUrl,
                     disableRange: true,
                     disableStream: true,
                     disableAutoFetch: true,
                 });
+
                 const pdf = await task.promise;
                 if (cancelled) return;
 
@@ -83,17 +107,36 @@ export default function PdfPage() {
                 const safePageNum = Math.min(Math.max(1, pageNum), pdf.numPages);
                 const page = await pdf.getPage(safePageNum);
 
-                const viewport = page.getViewport({ scale });
+                // základní viewport pro zjištění rozměrů
+                const baseViewport = page.getViewport({ scale: 1 });
+
+                // dostupná plocha – malá rezerva, aby se to nikdy “neuseklo”
+                const availW = Math.max(320, window.innerWidth) * 0.98;
+                const availH = Math.max(240, window.innerHeight) * 0.98;
+
+                // "fit-to-screen" (contain)
+                const fitScale = Math.min(availW / baseViewport.width, availH / baseViewport.height);
+
+                // finální scale = fit * zoom, rozumné meze
+                const finalScale = Math.max(0.6, Math.min(6.0, fitScale * zoom));
+
+                const viewport = page.getViewport({ scale: finalScale });
 
                 const canvas = canvasRef.current;
                 if (!canvas) return;
                 const ctx = canvas.getContext("2d");
                 if (!ctx) return;
 
-                canvas.width = Math.floor(viewport.width);
-                canvas.height = Math.floor(viewport.height);
+                // ostrost na TV: renderuj ve vyšším interním rozlišení
+                const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // limit 2 kvůli výkonu
+                canvas.style.width = `${Math.floor(viewport.width)}px`;
+                canvas.style.height = `${Math.floor(viewport.height)}px`;
+                canvas.width = Math.floor(viewport.width * dpr);
+                canvas.height = Math.floor(viewport.height * dpr);
 
-                await page.render({ canvasContext: ctx, viewport }).promise;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                await page.render({ canvasContext: ctx, viewport } as any).promise;
 
                 if (!cancelled) setLoading(false);
             } catch (e: any) {
@@ -104,20 +147,10 @@ export default function PdfPage() {
             }
         })();
 
-        return () => { cancelled = true; };
-    }, [pdfUrl, pageNum, scale]);
-
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "ArrowLeft") { e.preventDefault(); setPageNum(p => Math.max(1, p - 1)); }
-            if (e.key === "ArrowRight") { e.preventDefault(); setPageNum(p => Math.min(numPages, p + 1)); }
-            if (e.key === "+" || e.key === "=") { e.preventDefault(); setScale(s => Math.min(3.0, Number((s + 0.2).toFixed(2)))); }
-            if (e.key === "-" || e.key === "_") { e.preventDefault(); setScale(s => Math.max(0.8, Number((s - 0.2).toFixed(2)))); }
+        return () => {
+            cancelled = true;
         };
-
-        window.addEventListener("keydown", onKeyDown, true);
-        return () => window.removeEventListener("keydown", onKeyDown, true);
-    }, [numPages]);
+    }, [pdfUrl, pageNum, zoom, resizeTick]);
 
     return (
         <div
@@ -125,23 +158,37 @@ export default function PdfPage() {
                 width: "100vw",
                 height: "100vh",
                 background: "#000",
+                color: "#fff",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                overflow: "hidden",
+                position: "relative",
             }}
         >
             {err ? (
-                <div style={{ color: "#fff", fontSize: 24 }}>{err}</div>
+                <div style={{ padding: 24, fontSize: 24 }}>{err}</div>
             ) : (
-                <canvas
-                    ref={canvasRef}
-                    style={{
-                        maxWidth: "100vw",
-                        maxHeight: "100vh",
-                        objectFit: "contain"
-                    }}
-                />
+                <canvas ref={canvasRef} />
             )}
+
+            {/* malý overlay, ať víš kde jsi (nezabírá místo) */}
+            <div
+                style={{
+                    position: "absolute",
+                    top: 18,
+                    right: 18,
+                    background: "rgba(0,0,0,0.55)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    padding: "8px 14px",
+                    borderRadius: 18,
+                    fontSize: 18,
+                    pointerEvents: "none",
+                    opacity: 0.95,
+                }}
+            >
+                {loading ? "Načítám…" : `${pageNum}/${numPages}`} &nbsp;|&nbsp; zoom {Math.round(zoom * 100)}%
+            </div>
         </div>
     );
 }
