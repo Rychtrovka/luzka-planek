@@ -4,6 +4,32 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+declare global {
+    interface Window {
+        pdfjsLib?: any;
+    }
+}
+
+function loadScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[data-src="${src}"]`) as HTMLScriptElement | null;
+        if (existing) {
+            if ((existing as any)._loaded) return resolve();
+            existing.addEventListener("load", () => resolve());
+            existing.addEventListener("error", () => reject(new Error(`Script load failed: ${src}`)));
+            return;
+        }
+
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.dataset.src = src;
+        s.addEventListener("load", () => { (s as any)._loaded = true; resolve(); });
+        s.addEventListener("error", () => reject(new Error(`Script load failed: ${src}`)));
+        document.head.appendChild(s);
+    });
+}
+
 export default function PdfPage() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -34,11 +60,16 @@ export default function PdfPage() {
                 setErr(null);
                 setLoading(true);
 
-                // ✅ legacy WEB build (bez node "canvas" require)
-                const pdfjs = await import("pdfjs-dist/legacy/build/pdf.js");
-                (pdfjs as any).GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+                // ✅ načti pdfjs jako statický script (bez bundleru)
+                await loadScript("/pdfjs/pdf.min.js");
 
-                const task = (pdfjs as any).getDocument({ url: pdfUrl });
+                const pdfjs = window.pdfjsLib;
+                if (!pdfjs) throw new Error("pdfjsLib nenalezeno (script se nenačetl?)");
+
+                // worker z public
+                pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
+
+                const task = pdfjs.getDocument({ url: pdfUrl });
                 const pdf = await task.promise;
                 if (cancelled) return;
 
@@ -57,7 +88,7 @@ export default function PdfPage() {
                 canvas.width = Math.floor(viewport.width);
                 canvas.height = Math.floor(viewport.height);
 
-                await page.render({ canvasContext: ctx, viewport, canvas } as any).promise;
+                await page.render({ canvasContext: ctx, viewport }).promise;
 
                 if (!cancelled) setLoading(false);
             } catch (e: any) {
@@ -68,9 +99,7 @@ export default function PdfPage() {
             }
         })();
 
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, [pdfUrl, pageNum, scale]);
 
     useEffect(() => {
