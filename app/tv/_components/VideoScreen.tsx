@@ -52,6 +52,20 @@ export default function VideoScreen({
         wrapperRef.current?.focus();
     }, []);
 
+    useEffect(() => {
+        const v = videoRef.current;
+        if (!v) return;
+
+        v.addEventListener("error", (e) => {
+            console.error("VIDEO ERROR", v.error);
+        });
+
+        v.addEventListener("play", () => console.log("VIDEO PLAY"));
+        v.addEventListener("playing", () => console.log("VIDEO PLAYING"));
+        v.addEventListener("stalled", () => console.log("VIDEO STALLED"));
+        v.addEventListener("waiting", () => console.log("VIDEO WAITING"));
+    }, []);
+
     const videoStyle: CSSProperties = {
         ...styles.video,
         maxWidth: "90%",
