@@ -99,6 +99,9 @@ export default function MenusPage() {
 
             <div style={pageStyles.content}>
                 <div style={pageStyles.header}>
+                    <div style={{ position:"fixed", left:10, bottom:10, color:"#0f0", fontSize:12, zIndex:99999 }}>
+                        PAGE: MENUS
+                    </div>
                     <div style={pageStyles.title}>
                         {selectedUrl ? "📄 Zde je váš jídelní lístek" : "🍽️ Jídelní lístky námi doporučovaných podniků"}
                     </div>
