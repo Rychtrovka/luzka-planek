@@ -15,9 +15,17 @@ interface VideoScreenProps {
     setVideoTime: (time: number) => void;
     setVideoDuration: (time: number) => void;
     onEnded: () => void;
+}
 
-    // ✅ přidej: co se má stát při Back/Escape
-    onBack: () => void;
+function toHttpsVideoUrl(rawUrl: string): string {
+    if (!rawUrl) return "";
+
+    // udělá z různých variant vždy https://video.rychtrovka.cz/...
+    const cleaned = rawUrl
+        .replace(/^https?:\/\/video\.rychtrovka\.cz/i, "")
+        .replace(/^video\.rychtrovka\.cz\//i, "/");
+
+    return cleaned ? `https://video.rychtrovka.cz${cleaned.startsWith("/") ? "" : "/"}${cleaned.replace(/^\//, "")}` : "";
 }
 
 export default function VideoScreen({
@@ -32,60 +40,17 @@ export default function VideoScreen({
                                         setVideoTime,
                                         setVideoDuration,
                                         onEnded,
-                                        onBack,
                                     }: VideoScreenProps) {
     const wrapperRef = useRef<HTMLDivElement | null>(null);
 
     const finalVideoSrc = useMemo(() => {
         const rawUrl = videoKey && videos[videoKey] ? videos[videoKey].url : "";
-
-        const cleanFileName = rawUrl
-            .replace("https://video.rychtrovka.cz", "")
-            .replace("http://video.rychtrovka.cz", "")
-            .replace("video.rychtrovka.cz/", "");
-
-        return cleanFileName ? "https://video.rychtrovka.cz" + cleanFileName : "";
+        return toHttpsVideoUrl(rawUrl);
     }, [videoKey, videos]);
 
-    // ✅ focus na wrapper (spolehlivě, ne přes ref callback)
     useEffect(() => {
         wrapperRef.current?.focus();
     }, []);
-
-    // ✅ Backspace / Escape / BrowserBack -> návrat na předchozí obrazovku
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => {
-            const isBack =
-                e.key === "Escape" ||
-                e.key === "Backspace" ||
-                e.key === "BrowserBack" ||
-                e.key === "Back" ||
-                e.keyCode === 27 ||
-                e.keyCode === 8 ||
-                e.keyCode === 166;
-
-            if (!isBack) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            // zastav video (ať neběží na pozadí)
-            const v = videoRef.current;
-            if (v) {
-                try {
-                    v.pause();
-                    v.currentTime = 0;
-                } catch {}
-            }
-            setVideoTime(0);
-            setVideoDuration(0);
-
-            onBack();
-        };
-
-        window.addEventListener("keydown", onKeyDown, true); // capture = true
-        return () => window.removeEventListener("keydown", onKeyDown, true);
-    }, [onBack, setVideoDuration, setVideoTime, videoRef]);
 
     const videoStyle: CSSProperties = {
         ...styles.video,
@@ -97,11 +62,7 @@ export default function VideoScreen({
     };
 
     return (
-        <div
-            ref={wrapperRef}
-            style={styles.videoPage}
-            tabIndex={0} // aby šel fokus
-        >
+        <div ref={wrapperRef} style={styles.videoPage} tabIndex={0}>
             <div style={styles.videoHeader}>
                 <div style={styles.videoTitle}>{videoKey ? t.tiles[videoKey] : ""}</div>
                 <div style={styles.videoHint}>{t.videoHint}</div>
