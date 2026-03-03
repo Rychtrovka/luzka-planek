@@ -87,6 +87,9 @@ export default function TimeTablesPage() {
             <div style={pageStyles.overlay} />
 
             <div style={pageStyles.content}>
+                <div style={{ position:"fixed", left:10, bottom:10, color:"#0f0", fontSize:12, zIndex:99999 }}>
+                    PAGE: TIMETABLES
+                </div>
                 <div style={pageStyles.header}>
                     <div style={pageStyles.title}>
                         {selectedUrl ? "📄 Zde je požadovaný jízdní řád" : "🚌 Jízdní řády"}
