@@ -16,6 +16,7 @@ import WelcomeDashboard from "./_components/WelcomeDashboard"
 import MenuScreen from "./_components/MenuScreen"
 import DetailScreen from "./_components/DetailScreen"
 import VideoScreen, {VideoKey} from "./_components/VideoScreen"
+
 // Pomocné funkce mimo komponentu pro čistší tělo
 const formatTime = (sec: number) => {
   const s = Math.max(0, Math.floor(sec || 0))
@@ -147,6 +148,11 @@ export default function TVPage() {
                 formatTime={formatTime}
                 setVideoTime={setVideoTime}
                 setVideoDuration={setVideoDuration}
+                onBack={() => {
+                    // např. návrat do menu
+                    setVideoKey(null);
+                    setScreen("MENU");
+                }}
                 onEnded={() => {
                   setVideoTime(0)
                   setVideoDuration(0)
