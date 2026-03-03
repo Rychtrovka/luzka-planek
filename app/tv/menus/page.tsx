@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { kioskConfig } from "../_data/kioskConfig";
 import { usePdfList } from "../_hooks/usePdfList";
 
@@ -17,37 +17,45 @@ export default function MenusPage() {
 
     const viewerRef = useRef<HTMLDivElement | null>(null);
 
-    const openPdf = (pdfDirectUrl: string) => {
+    const openPdf = useCallback((pdfDirectUrl: string) => {
         const r = viewerRef.current?.getBoundingClientRect();
         const w = r ? Math.round(r.width) : 1200;
         const h = r ? Math.round(r.height) : 700;
 
         setSelectedUrl(`/pdf?url=${encodeURIComponent(pdfDirectUrl)}&w=${w}&h=${h}`);
-    };
+    }, []);
+
+    const goBack = useCallback(() => {
+        if (selectedUrl) {
+            setSelectedUrl(null);
+            return;
+        }
+        window.history.back();
+    }, [selectedUrl]);
 
     useEffect(() => {
-        const onKey = (e: KeyboardEvent) => {
-            const isBack =
-                e.key === "Escape" ||
-                e.key === "Backspace" ||
-                e.key === "BrowserBack" ||
-                e.keyCode === 27 ||
-                e.keyCode === 8 ||
-                e.keyCode === 166;
+        const isBackKey = (e: KeyboardEvent) =>
+            e.key === "Escape" ||
+            e.key === "Backspace" ||
+            e.key === "BrowserBack" ||
+            e.key === "Back" ||
+            e.keyCode === 27 ||
+            e.keyCode === 8 ||
+            e.keyCode === 166;
 
-            if (isBack) {
+        const isEnterKey = (e: KeyboardEvent) =>
+            e.key === "Enter" || e.key === "OK" || e.key === "Select" || e.keyCode === 13;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            // BACK (klávesnice / některé ovladače jako keydown)
+            if (isBackKey(e)) {
                 e.preventDefault();
                 e.stopPropagation();
-                // když je otevřený PDF viewer v iframe, zavři ho v rámci UI
-                if (selectedUrl) {
-                    setSelectedUrl(null);
-                }
-                // jinak NIC – back vyřeší Android (onBackPressed -> web.goBack / kiosk)
+                goBack();
                 return;
             }
 
-            // Když je otevřené PDF, šipky necháváme na /pdf viewer (iframe).
-            // MenusPage jen neřeší navigaci v gridu.
+            // když je otevřený PDF viewer, šipky/enter necháme na /pdf viewer
             if (selectedUrl) return;
 
             if (!max) return;
@@ -57,16 +65,26 @@ export default function MenusPage() {
             if (e.key === "ArrowDown") setFocused((i) => Math.min(i + cols, max - 1));
             if (e.key === "ArrowUp") setFocused((i) => Math.max(i - cols, 0));
 
-            if (e.key === "Enter" || e.key === "OK" || e.keyCode === 13) {
+            if (isEnterKey(e)) {
                 e.preventDefault();
                 const url = safe[focused]?.url;
                 if (url) openPdf(url);
             }
         };
 
-        window.addEventListener("keydown", onKey, false);
-        return () => window.removeEventListener("keydown", onKey, false);
-    }, [focused, max, safe, selectedUrl]);
+        // BACK z Androidu (ovladač) -> MainActivity posílá custom event
+        const onRychtrovkaBack = (_e: Event) => {
+            goBack();
+        };
+
+        window.addEventListener("keydown", onKeyDown, true); // capture = true je na TV spolehlivější
+        window.addEventListener("rychtrovka:back", onRychtrovkaBack as EventListener, true);
+
+        return () => {
+            window.removeEventListener("keydown", onKeyDown, true);
+            window.removeEventListener("rychtrovka:back", onRychtrovkaBack as EventListener, true);
+        };
+    }, [cols, focused, goBack, max, openPdf, safe, selectedUrl]);
 
     return (
         <div style={pageStyles.container}>
@@ -85,7 +103,7 @@ export default function MenusPage() {
                         {selectedUrl ? "📄 Zde je váš jídelní lístek" : "🍽️ Jídelní lístky námi doporučovaných podniků"}
                     </div>
                     <div style={pageStyles.hint}>
-                        {selectedUrl ? "←/→ stránka  • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Šipka zpět"}
+                        {selectedUrl ? "←/→ stránka  • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Zpět"}
                     </div>
                 </div>
 
@@ -95,7 +113,7 @@ export default function MenusPage() {
                             <iframe
                                 src={selectedUrl}
                                 style={pageStyles.pdfFrame}
-                                //allow="fullscreen"
+                                // allow="fullscreen"
                             />
                         </div>
                     ) : (
@@ -177,8 +195,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
         flex: 1,
         borderRadius: 24,
         overflow: "hidden",
-       // background: "rgba(0,0,0,0.1)",
-        background:"transparent",
+        background: "transparent",
         border: "1px solid rgba(255,255,255,0.15)",
         position: "relative",
     },
@@ -190,6 +207,8 @@ const pageStyles: Record<string, React.CSSProperties> = {
         overflow: "hidden",
         borderRadius: 12,
         background: "transparent",
+        display: "flex",
+        justifyContent: "center",
     },
 
     pdfFrame: {
