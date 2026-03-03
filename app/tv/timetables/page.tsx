@@ -25,32 +25,33 @@ export default function TimeTablesPage() {
     }, []);
 
     const goBack = useCallback(() => {
-        if (selectedUrl) setSelectedUrl(null);
-        else window.history.back();
+        if (selectedUrl) {
+            setSelectedUrl(null);
+            return;
+        }
+        // Stabilnější než history.back() na TV/WebView
+        window.location.href = "/tv/info";
     }, [selectedUrl]);
 
     useEffect(() => {
-        const isBackKey = (e: KeyboardEvent) =>
-            e.key === "Escape" ||
-            e.key === "Backspace" ||
-            e.key === "BrowserBack" ||
-            e.key === "Back" ||
-            e.keyCode === 27 ||
-            e.keyCode === 8 ||
-            e.keyCode === 166;
+        const onKey = (e: KeyboardEvent) => {
+            const isBack =
+                e.key === "Escape" ||
+                e.key === "Backspace" ||
+                e.key === "BrowserBack" ||
+                e.key === "Back" ||
+                e.keyCode === 27 ||
+                e.keyCode === 8 ||
+                e.keyCode === 166;
 
-        const isEnterKey = (e: KeyboardEvent) =>
-            e.key === "Enter" || e.key === "OK" || e.key === "Select" || e.keyCode === 13;
-
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (isBackKey(e)) {
+            if (isBack) {
                 e.preventDefault();
                 e.stopPropagation();
                 goBack();
                 return;
             }
 
-            // když je otevřený PDF viewer, šipky/enter necháme na /pdf viewer
+            // když je otevřený PDF viewer, šipky nech /pdf vieweru
             if (selectedUrl) return;
 
             if (!max) return;
@@ -60,43 +61,34 @@ export default function TimeTablesPage() {
             if (e.key === "ArrowDown") setFocused((i) => Math.min(i + cols, max - 1));
             if (e.key === "ArrowUp") setFocused((i) => Math.max(i - cols, 0));
 
-            if (isEnterKey(e)) {
+            if (e.key === "Enter" || e.key === "OK" || e.keyCode === 13) {
                 e.preventDefault();
                 const url = safe[focused]?.url;
                 if (url) openPdf(url);
             }
         };
 
-
-        const onRychtrovkaBack = (_e: Event) => {
-            goBack();
-        };
-
-        window.addEventListener("keydown", onKeyDown, true);
-        window.addEventListener("rychtrovka:back", onRychtrovkaBack as EventListener, true);
-
-        return () => {
-            window.removeEventListener("keydown", onKeyDown, true);
-            window.removeEventListener("rychtrovka:back", onRychtrovkaBack as EventListener, true);
-        };
+        // capture=true je důležité na TV (kvůli focusu v iframe/webview)
+        window.addEventListener("keydown", onKey, true);
+        return () => window.removeEventListener("keydown", onKey, true);
     }, [cols, focused, goBack, max, openPdf, safe, selectedUrl]);
 
     return (
         <div style={pageStyles.container}>
+            {/* DIAG - klidně smaž */}
+            <div style={pageStyles.diag}>PAGE: TIMETABLES • items={safe.length}</div>
+
             <img src="/media/RychterIS_final.png" alt="Logo" style={pageStyles.logo} width="180" />
             <div style={pageStyles.backgroundLayer} />
             <div style={pageStyles.overlay} />
 
             <div style={pageStyles.content}>
-                <div style={{ position:"fixed", left:10, bottom:10, color:"#0f0", fontSize:12, zIndex:99999 }}>
-                    PAGE: TIMETABLES
-                </div>
                 <div style={pageStyles.header}>
                     <div style={pageStyles.title}>
                         {selectedUrl ? "📄 Zde je požadovaný jízdní řád" : "🚌 Jízdní řády"}
                     </div>
                     <div style={pageStyles.hint}>
-                        {selectedUrl ? "←/→ stránka • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Zpět"}
+                        {selectedUrl ? "←/→ stránka • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Backspace/Escape"}
                     </div>
                 </div>
 
@@ -137,12 +129,23 @@ export default function TimeTablesPage() {
 const pageStyles: Record<string, React.CSSProperties> = {
     container: { height: "100vh", position: "relative", overflow: "hidden", background: "white" },
 
+    diag: {
+        position: "fixed",
+        left: 10,
+        bottom: 10,
+        zIndex: 99999,
+        color: "#0f0",
+        fontSize: 12,
+        opacity: 0.9,
+        pointerEvents: "none",
+    },
+
     logo: {
-        position: "absolute" as const,
+        position: "absolute",
         top: 10,
         right: 10,
         zIndex: 9999,
-        pointerEvents: "none" as const,
+        pointerEvents: "none",
         filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
     },
 
@@ -191,8 +194,6 @@ const pageStyles: Record<string, React.CSSProperties> = {
         overflow: "hidden",
         borderRadius: 12,
         background: "transparent",
-        display: "flex",
-        justifyContent: "center",
     },
 
     pdfFrame: {
@@ -205,16 +206,6 @@ const pageStyles: Record<string, React.CSSProperties> = {
 
     gridPadding: { padding: 25, height: "100%" },
     grid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 15 },
-    item: {
-        cursor: "pointer",
-        fontSize: 25,
-        borderRadius: 18,
-        padding: "18px",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-    },
-
+    item: { cursor: "pointer", fontSize: 25, borderRadius: 18, padding: "18px", color: "white", display: "flex", alignItems: "center", gap: 12 },
     status: { color: "white", fontSize: 30, textAlign: "center", marginTop: 50 },
 };
