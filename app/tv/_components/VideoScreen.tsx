@@ -76,6 +76,7 @@ export default function VideoScreen({
                     style={videoStyle}
                     controls={false}
                     playsInline
+                    crossOrigin="anonymous"
                     autoPlay
                     preload="auto"
                     onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime || 0)}

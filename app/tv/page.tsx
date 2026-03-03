@@ -73,15 +73,41 @@ export default function TVPage() {
         localStorage.setItem("rychtrovka_lang", lang);
     }, [lang]);
 
-    // Autoplay (když už jsme ve VIDEO)
     useEffect(() => {
         if (screen !== "VIDEO") return;
-        const v = videoRef.current;
-        if (!v) return;
 
-        v.play().catch(() => {
-            console.warn("Autoplay blocked or failed");
-        });
+        let alive = true;
+        let tries = 0;
+
+        const tryPlay = async () => {
+            if (!alive) return;
+            const v = videoRef.current;
+            if (!v) {
+                requestAnimationFrame(tryPlay);
+                return;
+            }
+
+            // vynucení audia i když systém někdy dá volume 0
+            try { v.muted = false; v.volume = 1.0; } catch {}
+
+            try {
+                await v.play();
+                // úspěch
+            } catch (e) {
+                // některé WebView potřebují pár pokusů (focus/network)
+                tries += 1;
+                if (tries < 10) setTimeout(tryPlay, 250);
+                else console.warn("Video play failed:", e);
+            }
+        };
+
+        // malý delay po přepnutí obrazovky
+        const t = setTimeout(tryPlay, 100);
+
+        return () => {
+            alive = false;
+            clearTimeout(t);
+        };
     }, [screen, videoKey]);
 
     // --- REMOTE CONTROL ---
