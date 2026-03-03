@@ -178,6 +178,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
     title: { fontSize: 50, fontWeight: 900, color: "#ff2222" },
     hint: { fontSize: 18, color: "white", opacity: 0.9 },
 
+
     card: {
         flex: 1,
         borderRadius: 24,
