@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CSSProperties } from "react";
 
 export type VideoKey = "story" | "guide" | null;
@@ -19,15 +19,10 @@ interface VideoScreenProps {
 
 function toHttpsVideoUrl(rawUrl: string): string {
     if (!rawUrl) return "";
-
-    // když už je to https://video.rychtrovka.cz/..., necháme jen path
     let path = rawUrl
         .replace(/^https?:\/\/video\.rychtrovka\.cz/i, "")
         .replace(/^video\.rychtrovka\.cz\//i, "/");
-
-    // zajisti, že path začíná /
     if (!path.startsWith("/")) path = `/${path}`;
-
     return `https://video.rychtrovka.cz${path}`;
 }
 
@@ -45,6 +40,7 @@ export default function VideoScreen({
                                         onEnded,
                                     }: VideoScreenProps) {
     const wrapperRef = useRef<HTMLDivElement | null>(null);
+    const [dbg, setDbg] = useState("init");
 
     const finalVideoSrc = useMemo(() => {
         const rawUrl = videoKey && videos[videoKey] ? videos[videoKey].url : "";
@@ -55,6 +51,32 @@ export default function VideoScreen({
         wrapperRef.current?.focus();
     }, []);
 
+    // diagnostika stavu videa každých 400ms
+    useEffect(() => {
+        const id = window.setInterval(() => {
+            const v = videoRef.current;
+            if (!v) {
+                setDbg("no videoRef");
+                return;
+            }
+            const err = v.error
+                ? `err(code=${v.error.code}${v.error.message ? ` msg=${v.error.message}` : ""})`
+                : "err(none)";
+            setDbg(
+                [
+                    `src=${v.currentSrc || "(empty)"}`,
+                    `rs=${v.readyState}`, // 0..4
+                    `ns=${v.networkState}`, // 0..3
+                    `paused=${v.paused}`,
+                    `ct=${Math.round(v.currentTime * 10) / 10}`,
+                    err,
+                ].join(" | ")
+            );
+        }, 400);
+
+        return () => window.clearInterval(id);
+    }, [videoRef]);
+
     const videoStyle: CSSProperties = {
         ...styles.video,
         maxWidth: "90%",
@@ -62,7 +84,7 @@ export default function VideoScreen({
         margin: "0 auto",
         display: "block",
         objectFit: "contain",
-        outline: "none",
+        background: "transparent",
     };
 
     return (
@@ -71,6 +93,28 @@ export default function VideoScreen({
             style={{ ...styles.videoPage, outline: "none" }}
             tabIndex={0}
         >
+            {/* DIAGNOSTIKA – uvidíš přímo na TV */}
+            <div
+                style={{
+                    position: "absolute",
+                    top: 10,
+                    left: 10,
+                    right: 10,
+                    zIndex: 99999,
+                    fontSize: 14,
+                    color: "#0f0",
+                    background: "rgba(0,0,0,0.55)",
+                    padding: "6px 10px",
+                    borderRadius: 10,
+                    pointerEvents: "none",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                }}
+            >
+                key={String(videoKey)} | finalSrc={finalVideoSrc} | {dbg}
+            </div>
+
             <div style={styles.videoHeader}>
                 <div style={styles.videoTitle}>{videoKey ? t.tiles[videoKey] : ""}</div>
                 <div style={styles.videoHint}>{t.videoHint}</div>
@@ -86,22 +130,16 @@ export default function VideoScreen({
                     playsInline
                     autoPlay
                     preload="auto"
-                    crossOrigin="anonymous"
-                    onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime || 0)}
                     onLoadedMetadata={(e) => {
                         setVideoDuration(e.currentTarget.duration || 0);
                         e.currentTarget.volume = 1.0;
                     }}
+                    onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime || 0)}
+                    onEnded={onEnded}
                     onError={(e) => {
                         const v = e.currentTarget;
-                        // tenhle log uvidíš až když máš onConsoleMessage (nebo v browser devtools)
-                        console.log("VIDEO ERROR", {
-                            src: v.currentSrc,
-                            code: v.error?.code,
-                            message: v.error?.message,
-                        });
+                        console.log("VIDEO ERROR", v.currentSrc, v.error?.code, v.error?.message);
                     }}
-                    onEnded={onEnded}
                 />
 
                 <div style={styles.progressOverlay}>
