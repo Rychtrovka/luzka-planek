@@ -135,32 +135,33 @@ export default function TVPage() {
         )
       case "DETAIL":
         return <DetailScreen t={t} styles={styles} currentTileId={selectedTileId} />
-      case "VIDEO":
-        return (
-            <VideoScreen
-                t={t}
-                styles={styles}
-                videoKey={videoKey}
-                videoRef={videoRef}
-                videos={videos}
-                videoTime={videoTime}
-                videoDuration={videoDuration}
-                formatTime={formatTime}
-                setVideoTime={setVideoTime}
-                setVideoDuration={setVideoDuration}
-                onBack={() => {
-                    // např. návrat do menu
-                    setVideoKey(null);
-                    setScreen("MENU");
-                }}
-                onEnded={() => {
-                  setVideoTime(0)
-                  setVideoDuration(0)
-                  setVideoKey(null)
-                  setScreen("MENU")
-                }}
-            />
-        )
+        case "VIDEO":
+            return (
+                <VideoScreen
+                    t={t}
+                    styles={styles}
+                    videoKey={videoKey}
+                    videoRef={videoRef}
+                    videos={videos}
+                    videoTime={videoTime}
+                    videoDuration={videoDuration}
+                    formatTime={formatTime}
+                    setVideoTime={setVideoTime}
+                    setVideoDuration={setVideoDuration}
+                    onEnded={() => {
+                        setVideoTime(0)
+                        setVideoDuration(0)
+                        setVideoKey(null)
+                        setScreen("DETAIL")
+                    }}
+                    onBack={() => {
+                        setVideoTime(0)
+                        setVideoDuration(0)
+                        setVideoKey(null)
+                        setScreen("DETAIL")
+                    }}
+                />
+            )
       default:
         return null
     }
