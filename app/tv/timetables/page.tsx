@@ -67,6 +67,7 @@ export default function TimeTablesPage() {
             }
         };
 
+
         const onRychtrovkaBack = (_e: Event) => {
             goBack();
         };
