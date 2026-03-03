@@ -20,12 +20,15 @@ interface VideoScreenProps {
 function toHttpsVideoUrl(rawUrl: string): string {
     if (!rawUrl) return "";
 
-    // udělá z různých variant vždy https://video.rychtrovka.cz/...
-    const cleaned = rawUrl
+    // když už je to https://video.rychtrovka.cz/..., necháme jen path
+    let path = rawUrl
         .replace(/^https?:\/\/video\.rychtrovka\.cz/i, "")
         .replace(/^video\.rychtrovka\.cz\//i, "/");
 
-    return cleaned ? `https://video.rychtrovka.cz${cleaned.startsWith("/") ? "" : "/"}${cleaned.replace(/^\//, "")}` : "";
+    // zajisti, že path začíná /
+    if (!path.startsWith("/")) path = `/${path}`;
+
+    return `https://video.rychtrovka.cz${path}`;
 }
 
 export default function VideoScreen({
@@ -52,20 +55,6 @@ export default function VideoScreen({
         wrapperRef.current?.focus();
     }, []);
 
-    useEffect(() => {
-        const v = videoRef.current;
-        if (!v) return;
-
-        v.addEventListener("error", (e) => {
-            console.error("VIDEO ERROR", v.error);
-        });
-
-        v.addEventListener("play", () => console.log("VIDEO PLAY"));
-        v.addEventListener("playing", () => console.log("VIDEO PLAYING"));
-        v.addEventListener("stalled", () => console.log("VIDEO STALLED"));
-        v.addEventListener("waiting", () => console.log("VIDEO WAITING"));
-    }, []);
-
     const videoStyle: CSSProperties = {
         ...styles.video,
         maxWidth: "90%",
@@ -73,10 +62,15 @@ export default function VideoScreen({
         margin: "0 auto",
         display: "block",
         objectFit: "contain",
+        outline: "none",
     };
 
     return (
-        <div ref={wrapperRef} style={styles.videoPage} tabIndex={0}>
+        <div
+            ref={wrapperRef}
+            style={{ ...styles.videoPage, outline: "none" }}
+            tabIndex={0}
+        >
             <div style={styles.videoHeader}>
                 <div style={styles.videoTitle}>{videoKey ? t.tiles[videoKey] : ""}</div>
                 <div style={styles.videoHint}>{t.videoHint}</div>
@@ -90,13 +84,22 @@ export default function VideoScreen({
                     style={videoStyle}
                     controls={false}
                     playsInline
-                    crossOrigin="anonymous"
                     autoPlay
                     preload="auto"
+                    crossOrigin="anonymous"
                     onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime || 0)}
                     onLoadedMetadata={(e) => {
                         setVideoDuration(e.currentTarget.duration || 0);
                         e.currentTarget.volume = 1.0;
+                    }}
+                    onError={(e) => {
+                        const v = e.currentTarget;
+                        // tenhle log uvidíš až když máš onConsoleMessage (nebo v browser devtools)
+                        console.log("VIDEO ERROR", {
+                            src: v.currentSrc,
+                            code: v.error?.code,
+                            message: v.error?.message,
+                        });
                     }}
                     onEnded={onEnded}
                 />
