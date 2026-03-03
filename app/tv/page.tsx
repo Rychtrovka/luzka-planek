@@ -152,13 +152,13 @@ export default function TVPage() {
                         setVideoTime(0)
                         setVideoDuration(0)
                         setVideoKey(null)
-                        setScreen("DETAIL")
+                        setScreen("MENU")
                     }}
                     onBack={() => {
                         setVideoTime(0)
                         setVideoDuration(0)
                         setVideoKey(null)
-                        setScreen("DETAIL")
+                        setScreen("MENU")
                     }}
                 />
             )

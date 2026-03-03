@@ -85,7 +85,7 @@ export default function MenusPage() {
                         {selectedUrl ? "📄 Zde je váš jídelní lístek" : "🍽️ Jídelní lístky námi doporučovaných podniků"}
                     </div>
                     <div style={pageStyles.hint}>
-                        {selectedUrl ? "←/→ stránka  • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Escape"}
+                        {selectedUrl ? "←/→ stránka  • Zpět = Menu" : "Šipky = výběr • OK = otevřít • Zpět = Šipka zpět"}
                     </div>
                 </div>
 
