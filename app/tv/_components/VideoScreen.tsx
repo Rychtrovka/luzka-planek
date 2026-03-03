@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from "react";
+﻿import React, { useEffect, useMemo, useRef } from "react";
 import { CSSProperties } from "react";
 
 export type VideoKey = "story" | "guide" | null;
@@ -16,6 +16,8 @@ interface VideoScreenProps {
     setVideoDuration: (time: number) => void;
     onEnded: () => void;
 
+    // ✅ přidej: co se má stát při Back/Escape
+    onBack: () => void;
 }
 
 export default function VideoScreen({
@@ -30,20 +32,60 @@ export default function VideoScreen({
                                         setVideoTime,
                                         setVideoDuration,
                                         onEnded,
-
+                                        onBack,
                                     }: VideoScreenProps) {
+    const wrapperRef = useRef<HTMLDivElement | null>(null);
 
+    const finalVideoSrc = useMemo(() => {
+        const rawUrl = videoKey && videos[videoKey] ? videos[videoKey].url : "";
 
-    const rawUrl = (videoKey && videos[videoKey]) ? videos[videoKey].url : "";
+        const cleanFileName = rawUrl
+            .replace("https://video.rychtrovka.cz", "")
+            .replace("http://video.rychtrovka.cz", "")
+            .replace("video.rychtrovka.cz/", "");
 
-    const cleanFileName = rawUrl
-        .replace("https://video.rychtrovka.cz", "")
-        .replace("http://video.rychtrovka.cz", "")
-        .replace("video.rychtrovka.cz/", "");
+        return cleanFileName ? "https://video.rychtrovka.cz" + cleanFileName : "";
+    }, [videoKey, videos]);
 
-    const finalVideoSrc = cleanFileName
-        ? "https://video.rychtrovka.cz" + cleanFileName
-        : "";
+    // ✅ focus na wrapper (spolehlivě, ne přes ref callback)
+    useEffect(() => {
+        wrapperRef.current?.focus();
+    }, []);
+
+    // ✅ Backspace / Escape / BrowserBack -> návrat na předchozí obrazovku
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            const isBack =
+                e.key === "Escape" ||
+                e.key === "Backspace" ||
+                e.key === "BrowserBack" ||
+                e.key === "Back" ||
+                e.keyCode === 27 ||
+                e.keyCode === 8 ||
+                e.keyCode === 166;
+
+            if (!isBack) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // zastav video (ať neběží na pozadí)
+            const v = videoRef.current;
+            if (v) {
+                try {
+                    v.pause();
+                    v.currentTime = 0;
+                } catch {}
+            }
+            setVideoTime(0);
+            setVideoDuration(0);
+
+            onBack();
+        };
+
+        window.addEventListener("keydown", onKeyDown, true); // capture = true
+        return () => window.removeEventListener("keydown", onKeyDown, true);
+    }, [onBack, setVideoDuration, setVideoTime, videoRef]);
 
     const videoStyle: CSSProperties = {
         ...styles.video,
@@ -56,14 +98,12 @@ export default function VideoScreen({
 
     return (
         <div
+            ref={wrapperRef}
             style={styles.videoPage}
-            tabIndex={0}                 // 👈 aby měl wrapper focus
-            ref={(el) => el?.focus()}    // 👈 focus na mount
+            tabIndex={0} // aby šel fokus
         >
             <div style={styles.videoHeader}>
-                <div style={styles.videoTitle}>
-                    {videoKey ? t.tiles[videoKey] : ""}
-                </div>
+                <div style={styles.videoTitle}>{videoKey ? t.tiles[videoKey] : ""}</div>
                 <div style={styles.videoHint}>{t.videoHint}</div>
             </div>
 
@@ -77,9 +117,7 @@ export default function VideoScreen({
                     playsInline
                     autoPlay
                     preload="auto"
-                    onTimeUpdate={(e) =>
-                        setVideoTime(e.currentTarget.currentTime || 0)
-                    }
+                    onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime || 0)}
                     onLoadedMetadata={(e) => {
                         setVideoDuration(e.currentTarget.duration || 0);
                         e.currentTarget.volume = 1.0;
@@ -89,12 +127,8 @@ export default function VideoScreen({
 
                 <div style={styles.progressOverlay}>
                     <div style={styles.progressRow}>
-                        <div style={styles.timeText}>
-                            {formatTime(videoTime)}
-                        </div>
-                        <div style={styles.timeText}>
-                            {formatTime(videoDuration)}
-                        </div>
+                        <div style={styles.timeText}>{formatTime(videoTime)}</div>
+                        <div style={styles.timeText}>{formatTime(videoDuration)}</div>
                     </div>
 
                     <div style={styles.progressTrack}>
@@ -103,10 +137,7 @@ export default function VideoScreen({
                                 ...styles.progressFill,
                                 width:
                                     videoDuration > 0
-                                        ? Math.min(
-                                        100,
-                                        (videoTime / videoDuration) * 100
-                                    ) + "%"
+                                        ? `${Math.min(100, (videoTime / videoDuration) * 100)}%`
                                         : "0%",
                             }}
                         />
