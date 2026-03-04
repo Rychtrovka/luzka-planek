@@ -40,7 +40,7 @@ export default function Home() {
         <main
             style={{
                 height: "100vh",
-                background: "black",
+                background: "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
