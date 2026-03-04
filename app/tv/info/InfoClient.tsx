@@ -102,7 +102,7 @@ export default function InfoClient() {
                 return;
             }
 
-            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
                 e.preventDefault();
                 setFocus((f) => (f === 0 ? 1 : 0));
                 return;
