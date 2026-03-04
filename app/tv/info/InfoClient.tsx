@@ -172,7 +172,7 @@ export default function InfoClient() {
                             overflow: "hidden",
                             backdropFilter: "blur(3px)",
                             WebkitBackdropFilter: "blur(3px)",
-                            background: "rgba(0,0,0,0.35)",
+                            background: "rgba(240,0,0,0.55)",
                             border: "1px solid rgba(255,255,255,0.15)",
                             boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
                             padding: 22,
