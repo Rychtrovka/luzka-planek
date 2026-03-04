@@ -172,7 +172,7 @@ export default function InfoClient() {
                             overflow: "hidden",
                             backdropFilter: "blur(3px)",
                             WebkitBackdropFilter: "blur(3px)",
-                            background: "rgba(240,0,0,0.55)",
+                            background: "rgba(0,0,0,0.25)",
                             border: "1px solid rgba(255,255,255,0.15)",
                             boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
                             padding: 22,
@@ -248,6 +248,25 @@ export default function InfoClient() {
                                     WebkitBackdropFilter: "blur(3px)",
                                     boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
                                     color: "white",
+                                    userSelect: "none",
+                                }}
+                            >
+                                <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>🚌 {t.timetables}</div>
+                                <div style={{ opacity: 0.9, fontSize: 18 }}>Jízdní řády přebíráme z Portálu dopravy.</div>
+                            </div>
+
+                            <div
+                                onClick={() => openRoute("/tv/timetables")}
+                                style={{
+                                    cursor: "pointer",
+                                    borderRadius: 22,
+                                    padding: 18,
+                                    border: focus === 1 ? "3px solid rgba(255,255,255,0.9)" : "1px solid rgba(255,255,255,0.15)",
+                                    background: focus === 1 ? "rgba(0,255,0,0.14)" : "rgba(255,0,0,0.45)",
+                                    backdropFilter: "blur(3px)",
+                                    WebkitBackdropFilter: "blur(3px)",
+                                    boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
+                                    color: "green",
                                     userSelect: "none",
                                 }}
                             >
