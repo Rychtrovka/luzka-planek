@@ -224,12 +224,13 @@ export default function InfoClient() {
                                     borderRadius: 22,
                                     padding: 18,
                                     border: focus === 0 ? "3px solid rgba(255,34,34,1.0)" : "1px solid rgba(0,0,0,0.15)",
-                                    background: focus === 0 ? "rgba(255,255,255,0.54)" : "rgba(0,0,0,0.35)",
+                                    background: focus === 0 ? "rgba(255,255,255,0.24)" : "rgba(0,0,0,0.35)",
                                     backdropFilter: "blur(3px)",
                                     WebkitBackdropFilter: "blur(3px)",
                                     boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
                                     color: "white",
                                     userSelect: "none",
+                                    outline: "none",
                                 }}
                             >
                                 <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>🍽️ {t.menus}</div>
@@ -243,12 +244,13 @@ export default function InfoClient() {
                                     borderRadius: 22,
                                     padding: 18,
                                     border: focus === 1 ? "3px solid rgba(255,34,34,1.0)" : "1px solid rgba(0,0,0,0.15)",
-                                    background: focus === 1 ? "rgba(255,255,255,0.54)" : "rgba(0,0,0,0.35)",
+                                    background: focus === 1 ? "rgba(255,255,255,0.24)" : "rgba(0,0,0,0.35)",
                                     backdropFilter: "blur(3px)",
                                     WebkitBackdropFilter: "blur(3px)",
                                     boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
                                     color: "white",
                                     userSelect: "none",
+                                    outline: "none",
                                 }}
                             >
                                 <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>🚌 {t.timetables}</div>
