@@ -177,7 +177,7 @@ export default function DetailScreen({ t, styles, currentTileId }: Props) {
 const cardStyles: Record<string, React.CSSProperties> = {
     glass: {
         flex: 1,
-        background: "rgba(0,0,0,0.35)",
+        background: "rgba(30,0,0,0.35)",
         backdropFilter: "blur(6px)",
         borderRadius: 22,
         padding: 26,
