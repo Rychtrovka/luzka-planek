@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import {Caladea} from "next/font/google";
 
 export default function Home() {
     const router = useRouter();
@@ -40,7 +41,7 @@ export default function Home() {
         <main
             style={{
                 height: "100vh",
-                background: "transparent",
+                background: "black",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -63,6 +64,7 @@ export default function Home() {
             <div style={{ textAlign: "center", padding: 48 }}>
                 <div
                     style={{
+
                         fontSize: 54,
                         fontWeight: 900,
                         color: "#ff2222",
