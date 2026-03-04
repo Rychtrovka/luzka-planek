@@ -1,44 +1,73 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react" // Přidán useState
-import { kioskConfig } from "../_data/kioskConfig"
-import { styles as tvStyles } from "../_styles/tvStyles"
+import React, { useEffect, useMemo, useState } from "react";
+import { kioskConfig } from "../_data/kioskConfig";
+import { styles as tvStyles } from "../_styles/tvStyles";
 
 function isBackKey(e: KeyboardEvent) {
     return (
         e.key === "Escape" ||
         e.key === "Backspace" ||
         e.key === "BrowserBack" ||
+        e.key === "Back" ||
         e.keyCode === 27 ||
         e.keyCode === 8 ||
         e.keyCode === 166
-    )
+    );
 }
 
+type FrameState = "idle" | "loading" | "loaded" | "error" | "timeout";
+
 export default function BeerPage() {
-    const [isLocked, setIsLocked] = useState(true); // Stav pro zámek (štít)
+    const [isLocked, setIsLocked] = useState(true);
+    const [frameState, setFrameState] = useState<FrameState>("idle");
+    const [frameErr, setFrameErr] = useState<string | null>(null);
+
+    const url = kioskConfig.urls.beer;
+
+    const canEmbedHint = useMemo(() => {
+        // jen kosmetika – pokud je to http, WebView může být citlivá
+        try {
+            const u = new URL(url);
+            return u.protocol === "https:" ? "HTTPS" : "POZOR: není HTTPS";
+        } catch {
+            return "Neplatná URL";
+        }
+    }, [url]);
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
-            // Tlačítko zpět funguje VŽDY, pokud je focus na hlavní stránce
             if (isBackKey(e)) {
-                e.preventDefault()
-                window.location.href = "/tv"
+                e.preventDefault();
+                // návrat na /tv
+                window.location.href = "/tv";
             }
-        }
+        };
 
-        window.addEventListener("keydown", handleKey, true)
-        return () => window.removeEventListener("keydown", handleKey, true)
-    }, [])
+        window.addEventListener("keydown", handleKey, true);
+        return () => window.removeEventListener("keydown", handleKey, true);
+    }, []);
+
+    // pokud iframe nic neřekne, zkusíme timeout – typicky blokace X-Frame/CSP se tváří "mrtvě"
+    useEffect(() => {
+        setFrameState("loading");
+        setFrameErr(null);
+
+        const t = window.setTimeout(() => {
+            setFrameState((s) => (s === "loaded" ? s : "timeout"));
+        }, 6000);
+
+        return () => window.clearTimeout(t);
+    }, [url]);
+
+    const openFullscreen = () => {
+        // nejspolehlivější fallback: otevřít cílovou stránku jako top-level
+        window.location.href = url;
+    };
 
     return (
         <div style={pageStyles.container}>
-            <img
-                src="/media/RychterIS_final.png"
-                alt="Logo"
-                style={pageStyles.logo}
-                width="180"
-            />
+            <img src="/media/RychterIS_final.png" alt="Logo" style={pageStyles.logo} width="180" />
             <div style={pageStyles.overlay} />
 
             <div style={pageStyles.header}>
@@ -47,62 +76,157 @@ export default function BeerPage() {
                     Pivoměr
                 </div>
 
-                {/* Přepínač přístupu */}
-                <div style={{ display: 'flex', gap: 20, alignItems: 'center', zIndex: 100 }}>
+                <div style={{ display: "flex", gap: 20, alignItems: "center", zIndex: 100 }}>
                     <button
-                        onClick={() => setIsLocked(!isLocked)}
+                        type="button"
+                        onClick={() => setIsLocked((v) => !v)}
                         style={{
-                            padding: '8px 16px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            background: isLocked ? 'rgba(255,255,255,0.2)' : '#ff2222',
-                            color: 'white',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            pointerEvents: 'auto' // Důležité!
+                            padding: "8px 16px",
+                            borderRadius: 12,
+                            border: "none",
+                            background: isLocked ? "rgba(255,255,255,0.2)" : "#ff2222",
+                            color: "white",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            pointerEvents: "auto",
                         }}
                     >
                         {isLocked ? "🔒 Odemknout ovládání" : "🔓 Zamknout (aktivovat Zpět)"}
                     </button>
+
                     <div style={pageStyles.hint}>Zpět = Escape / Back</div>
                 </div>
             </div>
 
             <div style={pageStyles.content}>
-                <div style=
-                         {{...pageStyles.frameCard,
-                             width: "40%",
-                             backgroundColor: "rgba(0, 0, 0, 0.2)",
-                         }}
-                > {/* Zúžení zde */}
-
-                    {/* Podmíněný štít */}
+                <div style={pageStyles.frameCard}>
+                    {/* “štít” proti klikání – jen když je zamčeno */}
                     {isLocked && (
                         <div
                             style={{
-                                position: 'absolute',
+                                position: "absolute",
                                 inset: 0,
                                 zIndex: 10,
-                                background: 'transparent'
+                                background: "transparent",
                             }}
                         />
                     )}
 
+                    {/* diagnostika nahoře – ať víme, co se děje */}
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: 10,
+                            left: 10,
+                            right: 10,
+                            zIndex: 20,
+                            display: "flex",
+                            gap: 10,
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            pointerEvents: "none",
+                        }}
+                    >
+                        <div
+                            style={{
+                                padding: "6px 10px",
+                                borderRadius: 12,
+                                background: "rgba(0,0,0,0.55)",
+                                border: "1px solid rgba(255,255,255,0.15)",
+                                color: "rgba(255,255,255,0.85)",
+                                fontSize: 13,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            }}
+                            title={url}
+                        >
+                            {canEmbedHint} • {frameState} • {url}
+                        </div>
+
+                        {(frameState === "timeout" || frameState === "error") && (
+                            <div
+                                style={{
+                                    padding: "6px 10px",
+                                    borderRadius: 12,
+                                    background: "rgba(255,34,34,0.18)",
+                                    border: "1px solid rgba(255,34,34,0.45)",
+                                    color: "white",
+                                    fontSize: 13,
+                                }}
+                            >
+                                Embed blokovaný? (X-Frame-Options / CSP)
+                            </div>
+                        )}
+                    </div>
+
+                    {(frameState === "timeout" || frameState === "error") && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                inset: 0,
+                                zIndex: 30,
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 12,
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: 24,
+                                background: "rgba(0,0,0,0.35)",
+                                textAlign: "center",
+                                pointerEvents: "auto",
+                            }}
+                        >
+                            <div style={{ fontSize: 22, fontWeight: 900, color: "white" }}>
+                                Pivoměr nelze vložit do rámu
+                            </div>
+                            <div style={{ fontSize: 16, color: "rgba(255,255,255,0.85)", maxWidth: 640 }}>
+                                Často to způsobí blokace na cílovém webu (X-Frame-Options / CSP). Fallback je otevřít pivoměr
+                                v celé stránce.
+                            </div>
+
+                            {frameErr && (
+                                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{frameErr}</div>
+                            )}
+
+                            <button
+                                type="button"
+                                onClick={openFullscreen}
+                                style={{
+                                    padding: "10px 18px",
+                                    borderRadius: 14,
+                                    border: "none",
+                                    background: "#ff2222",
+                                    color: "white",
+                                    fontWeight: 900,
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Otevřít pivoměr (fullscreen)
+                            </button>
+                        </div>
+                    )}
+
                     <iframe
-                        src={kioskConfig.urls.beer}
+                        src={url}
                         title="Pivoměr"
                         style={pageStyles.frame}
                         frameBorder={0}
                         scrolling="no"
+                        // některé weby to chtějí explicitně:
+                        allow="fullscreen"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        onLoad={() => setFrameState("loaded")}
+                        onError={() => {
+                            setFrameState("error");
+                            setFrameErr("Iframe onError (často CSP/X-Frame).");
+                        }}
                     />
                 </div>
             </div>
         </div>
-    )
+    );
 }
-
-// ... zbytek pageStyles zůstává stejný, jen přidejte position: "relative" do frameCard
-
 
 const pageStyles: Record<string, React.CSSProperties> = {
     container: {
@@ -145,10 +269,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
         gap: 12,
     },
 
-    icon: {
-        fontSize: 34,
-        lineHeight: 1,
-    },
+    icon: { fontSize: 34, lineHeight: 1 },
 
     hint: {
         fontSize: 18,
@@ -179,6 +300,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
         background: "rgba(0,0,0,0.15)",
         border: "1px solid rgba(255,255,255,0.15)",
         boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
+        position: "relative", // ✅ důležité pro overlay/diagnostiku
     },
 
     frame: {
@@ -188,6 +310,7 @@ const pageStyles: Record<string, React.CSSProperties> = {
         display: "block",
         background: "transparent",
     },
+
     logo: {
         position: "absolute" as const,
         top: 10,
@@ -195,5 +318,5 @@ const pageStyles: Record<string, React.CSSProperties> = {
         zIndex: 9999,
         pointerEvents: "none" as const,
         filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
-    }
-}
+    },
+};
