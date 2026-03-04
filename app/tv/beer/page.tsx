@@ -115,12 +115,14 @@ export default function BeerPage() {
                     <iframe
                         src={url}
                         title="Pivoměr"
-                        style={pageStyles.frame}
-                        frameBorder={0}
+                        style={{
+                            ...pageStyles.frame,
+                            border: 'none', // Nahrazuje frameBorder
+                            backgroundColor: 'transparent' // Zajišťuje průhlednost
+                        }}
                         scrolling="no"
                         allow="fullscreen"
-                        allowTransparency={true}
-
+                        // allowTransparency={true}  <-- Odstraněno, v moderních prohlížečích zbytečné
                     />
 
                 </div>
