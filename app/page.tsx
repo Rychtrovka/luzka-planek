@@ -23,7 +23,7 @@ export default function Home() {
 
     return (
         <main style={{ background: 'black', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ color: '#ff2222', fontSize: '32px' }}>Inicializace systému RychterIS...</div>
+            <div style={{ color: '#ff2222', fontSize: '48px' }}>Inicializace systému RychterIS...</div>
         </main>
     );
 }

@@ -209,7 +209,7 @@ const cardStyles: Record<string, React.CSSProperties> = {
         backdropFilter: "blur(6px)",
         borderRadius: 20,
         padding: "18px",
-        color: "white",
+        color: "green",
         display: "flex",
         gap: 14,
         alignItems: "center",
