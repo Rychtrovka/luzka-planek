@@ -25,7 +25,15 @@ export default function BeerPage() {
 
     const url = kioskConfig.urls.beer;
 
-
+    const canEmbedHint = useMemo(() => {
+        // jen kosmetika – pokud je to http, WebView může být citlivá
+        try {
+            const u = new URL(url);
+            return u.protocol === "https:" ? "HTTPS" : "POZOR: není HTTPS";
+        } catch {
+            return "Neplatná URL";
+        }
+    }, [url]);
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
