@@ -223,8 +223,8 @@ export default function InfoClient() {
                                     cursor: "pointer",
                                     borderRadius: 22,
                                     padding: 18,
-                                    border: focus === 0 ? "3px solid rgba(255,255,255,0.9)" : "1px solid rgba(255,255,255,0.15)",
-                                    background: focus === 0 ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.35)",
+                                    border: focus === 1 ? "3px solid rgba(255,34,34,1.0)" : "1px solid rgba(255,255,255,0.15)",
+                                    background: focus === 1 ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.35)",
                                     backdropFilter: "blur(3px)",
                                     WebkitBackdropFilter: "blur(3px)",
                                     boxShadow: "0 25px 60px rgba(0,0,0,0.45)",
@@ -232,7 +232,7 @@ export default function InfoClient() {
                                     userSelect: "none",
                                 }}
                             >
-                                <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>🍽️ {t.menus}</div>
+                                <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>🍽️ {t.menus}</div>
                                 <div style={{ opacity: 0.9, fontSize: 18 }}>Otevře seznam. PDF dodávají naši přátelé, nemusí být aktuální.</div>
                             </div>
 
@@ -242,7 +242,7 @@ export default function InfoClient() {
                                     cursor: "pointer",
                                     borderRadius: 22,
                                     padding: 18,
-                                    border: focus === 1 ? "3px solid rgba(255,100,100,0.9)" : "1px solid rgba(255,255,255,0.15)",
+                                    border: focus === 1 ? "3px solid rgba(255,34,34,1.0)" : "1px solid rgba(255,255,255,0.15)",
                                     background: focus === 1 ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.35)",
                                     backdropFilter: "blur(3px)",
                                     WebkitBackdropFilter: "blur(3px)",
@@ -251,7 +251,7 @@ export default function InfoClient() {
                                     userSelect: "none",
                                 }}
                             >
-                                <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>🚌 {t.timetables}</div>
+                                <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>🚌 {t.timetables}</div>
                                 <div style={{ opacity: 0.9, fontSize: 18 }}>Jízdní řády přebíráme z Portálu dopravy.</div>
                             </div>
 

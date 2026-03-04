@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
-import { kioskConfig } from "../_data/kioskConfig";
 
 type Props = {
     t: {
@@ -20,10 +19,6 @@ type Props = {
             menuPdfSub?: string;
             timetablePdfTitle?: string;
             timetablePdfSub?: string;
-
-            // volitelné popisky pro meteo (když je časem chceš dát do překladů)
-            meteoTitle?: string;
-            meteoSub?: string;
         };
         tiles?: Record<string, string>;
     };
@@ -49,20 +44,16 @@ export default function DetailScreen({ t, styles, currentTileId }: Props) {
 
     useEffect(() => {
         let alive = true;
+
         if (!qrPayload) return;
 
         QRCode.toDataURL(qrPayload, {
             margin: 1,
             scale: 8,
             errorCorrectionLevel: "M",
-        })
-            .then((url) => {
-                if (alive) setQrDataUrl(url);
-            })
-            .catch((err) => {
-                console.error("QR Error:", err);
-                if (alive) setQrDataUrl("");
-            });
+        }).then((url) => {
+            if (alive) setQrDataUrl(url);
+        });
 
         return () => {
             alive = false;
@@ -77,56 +68,161 @@ export default function DetailScreen({ t, styles, currentTileId }: Props) {
         );
     }
 
+    // ---------- QUICK LINKS ----------
+    const links = useMemo(
+        () => [
+            {
+                icon: "🍽️",
+                title: info.menuPdfTitle || "Jídelní lístek",
+                sub: info.menuPdfSub || "Otevřít nabídku",
+                path: "/tv/menus",
+            },
+            {
+                icon: "🚌",
+                title: info.timetablePdfTitle || "Jízdní řády",
+                sub: info.timetablePdfSub || "Autobusy / Vlaky",
+                path: "/tv/timetables",
+            },
+        ],
+        [info]
+    );
+
+    const [focused, setFocused] = useState(0);
+    const refs = useRef<Array<HTMLButtonElement | null>>([]);
+
+    const openRoute = (path: string) => {
+        window.location.href = path;
+    };
+
+    // skutečný DOM focus
+    useEffect(() => {
+        refs.current[focused]?.focus();
+    }, [focused]);
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            const isBack =
+                e.key === "Escape" ||
+                e.key === "Backspace" ||
+                e.key === "BrowserBack" ||
+                e.keyCode === 27 ||
+                e.keyCode === 8 ||
+                e.keyCode === 166;
+
+            if (isBack) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.history.back();
+                return;
+            }
+
+            const isEnter =
+                e.key === "Enter" ||
+                e.key === "OK" ||
+                e.key === "Select" ||
+                e.keyCode === 13;
+
+            if (
+                e.key === "ArrowRight" ||
+                e.key === "ArrowDown"
+            ) {
+                e.preventDefault();
+                setFocused((i) => Math.min(i + 1, links.length - 1));
+                return;
+            }
+
+            if (
+                e.key === "ArrowLeft" ||
+                e.key === "ArrowUp"
+            ) {
+                e.preventDefault();
+                setFocused((i) => Math.max(i - 1, 0));
+                return;
+            }
+
+            if (isEnter) {
+                e.preventDefault();
+                openRoute(links[focused].path);
+            }
+        };
+
+        window.addEventListener("keydown", onKey, true);
+        return () => window.removeEventListener("keydown", onKey, true);
+    }, [focused, links]);
+
     const QuickLink = ({
+                           idx,
                            icon,
                            title,
                            sub,
                            path,
                        }: {
+        idx: number;
         icon: string;
         title: string;
         sub: string;
         path: string;
     }) => (
         <button
-            type="button"
-            onClick={() => {
-                window.location.href = path;
+            ref={(el) => (refs.current[idx] = el)}
+            tabIndex={0}
+            onClick={() => openRoute(path)}
+            style={{
+                ...cardStyles.button,
+                border:
+                    idx === focused
+                        ? "3px solid rgba(255,255,255,0.9)"
+                        : "1px solid rgba(255,255,255,0.18)",
+                background:
+                    idx === focused
+                        ? "rgba(255,255,255,0.14)"
+                        : "rgba(0,0,0,0.35)",
             }}
-            style={cardStyles.button}
         >
             <div style={{ fontSize: 34 }}>{icon}</div>
+
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <div style={{ fontSize: 24, fontWeight: 850 }}>{title}</div>
-                <div style={{ fontSize: 18, opacity: 0.85 }}>{sub}</div>
+                <div style={{ fontSize: 24, fontWeight: 850 }}>
+                    {title}
+                </div>
+
+                <div style={{ fontSize: 18, opacity: 0.85 }}>
+                    {sub}
+                </div>
             </div>
         </button>
     );
 
     return (
         <div style={{ ...styles.page, overflowY: "auto", paddingBottom: 40 }}>
-            <h1 style={{ ...styles.header, marginBottom: 26 }}>{info.title}</h1>
+            <h1 style={{ ...styles.header, marginBottom: 26 }}>
+                {info.title}
+            </h1>
 
-            {/* WIFI KARTA */}
+            {/* WIFI */}
             {wifi?.ssid && (
                 <div style={{ display: "flex", gap: 28, marginBottom: 22 }}>
                     <div style={cardStyles.glass}>
-                        <div style={{ fontSize: 30, fontWeight: 850, marginBottom: 10 }}>
+                        <div
+                            style={{
+                                fontSize: 30,
+                                fontWeight: 850,
+                                marginBottom: 10,
+                            }}
+                        >
                             📶 {wifi.label || "Wi-Fi"}
                         </div>
+
                         <div style={{ fontSize: 22, lineHeight: 1.5 }}>
                             <div>
                                 <b>SSID:</b> {wifi.ssid}
                             </div>
+
                             <div>
-                                <b>Heslo:</b> {wifi.password || "(bez hesla)"}
+                                <b>Heslo:</b>{" "}
+                                {wifi.password || "(bez hesla)"}
                             </div>
                         </div>
-                        {wifi.qrHint && (
-                            <div style={{ marginTop: 12, fontSize: 18, opacity: 0.85 }}>
-                                {wifi.qrHint}
-                            </div>
-                        )}
                     </div>
 
                     <div style={cardStyles.qrContainer}>
@@ -137,38 +233,34 @@ export default function DetailScreen({ t, styles, currentTileId }: Props) {
                                 style={{ width: "100%", height: "100%" }}
                             />
                         ) : (
-                            <div style={{ fontSize: 14, opacity: 0.5 }}>Načítám...</div>
+                            <div style={{ fontSize: 14, opacity: 0.5 }}>
+                                Načítám...
+                            </div>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* RYCHLÉ ODKAZY */}
-            <div style={{ fontSize: 20, opacity: 0.85, marginBottom: 12 }}>
+            {/* QUICK LINKS */}
+            <div
+                style={{
+                    fontSize: 20,
+                    opacity: 0.85,
+                    marginBottom: 12,
+                }}
+            >
                 {info.quickLinksTitle || "Rychlé odkazy"}
             </div>
 
-            <div style={cardStyles.linksGrid}>
-                <QuickLink
-                    icon="🍽️"
-                    title={info.menuPdfTitle || "Jídelní lístek"}
-                    sub={info.menuPdfSub || "Otevřít nabídku"}
-                    path="/tv/menus"
-                />
-
-                <QuickLink
-                    icon="🚌"
-                    title={info.timetablePdfTitle || "Jízdní řády"}
-                    sub={info.timetablePdfSub || "Autobusy / Vlaky"}
-                    path="/tv/timetables"
-                />
-
-                <QuickLink
-                    icon="🌤️"
-                    title={info.meteoTitle || "Meteo"}
-                    sub={info.meteoSub || "Počasí online"}
-                    path="https://meteo.rychtrovka.cz"
-                />
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 18,
+                }}
+            >
+                <QuickLink idx={0} {...links[0]} />
+                <QuickLink idx={1} {...links[1]} />
             </div>
         </div>
     );
@@ -177,7 +269,7 @@ export default function DetailScreen({ t, styles, currentTileId }: Props) {
 const cardStyles: Record<string, React.CSSProperties> = {
     glass: {
         flex: 1,
-        background: "rgba(30,0,0,0.35)",
+        background: "rgba(0,0,0,0.35)",
         backdropFilter: "blur(6px)",
         borderRadius: 22,
         padding: 26,
@@ -187,6 +279,7 @@ const cardStyles: Record<string, React.CSSProperties> = {
         justifyContent: "center",
         minHeight: 180,
     },
+
     qrContainer: {
         width: 220,
         background: "white",
@@ -196,11 +289,7 @@ const cardStyles: Record<string, React.CSSProperties> = {
         alignItems: "center",
         justifyContent: "center",
     },
-    linksGrid: {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: 18,
-    },
+
     button: {
         cursor: "pointer",
         textAlign: "left",
@@ -209,9 +298,10 @@ const cardStyles: Record<string, React.CSSProperties> = {
         backdropFilter: "blur(6px)",
         borderRadius: 20,
         padding: "18px",
-        color: "green",
+        color: "white",
         display: "flex",
         gap: 14,
         alignItems: "center",
+        outline: "none",
     },
 };
