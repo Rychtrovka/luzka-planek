@@ -119,6 +119,8 @@ export default function BeerPage() {
                         frameBorder={0}
                         scrolling="no"
                         allow="fullscreen"
+                        allowtransparency="true"
+
                     />
 
                 </div>
