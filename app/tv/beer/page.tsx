@@ -100,111 +100,16 @@ export default function BeerPage() {
 
             <div style={pageStyles.content}>
                 <div style={pageStyles.frameCard}>
-                    {/* “štít” proti klikání – jen když je zamčeno */}
+
                     {isLocked && (
                         <div
                             style={{
                                 position: "absolute",
                                 inset: 0,
                                 zIndex: 10,
-                                background: "transparent",
+                                background: "transparent"
                             }}
                         />
-                    )}
-
-                    {/* diagnostika nahoře – ať víme, co se děje */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            top: 10,
-                            left: 10,
-                            right: 10,
-                            zIndex: 20,
-                            display: "flex",
-                            gap: 10,
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            pointerEvents: "none",
-                        }}
-                    >
-                        <div
-                            style={{
-                                padding: "6px 10px",
-                                borderRadius: 12,
-                                background: "rgba(0,0,0,0.55)",
-                                border: "1px solid rgba(255,255,255,0.15)",
-                                color: "rgba(255,255,255,0.85)",
-                                fontSize: 13,
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            }}
-                            title={url}
-                        >
-                            {canEmbedHint} • {frameState} • {url}
-                        </div>
-
-                        {(frameState === "timeout" || frameState === "error") && (
-                            <div
-                                style={{
-                                    padding: "6px 10px",
-                                    borderRadius: 12,
-                                    background: "rgba(255,34,34,0.18)",
-                                    border: "1px solid rgba(255,34,34,0.45)",
-                                    color: "white",
-                                    fontSize: 13,
-                                }}
-                            >
-                                Embed blokovaný? (X-Frame-Options / CSP)
-                            </div>
-                        )}
-                    </div>
-
-                    {(frameState === "timeout" || frameState === "error") && (
-                        <div
-                            style={{
-                                position: "absolute",
-                                inset: 0,
-                                zIndex: 30,
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: 12,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                padding: 24,
-                                background: "rgba(0,0,0,0.35)",
-                                textAlign: "center",
-                                pointerEvents: "auto",
-                            }}
-                        >
-                            <div style={{ fontSize: 22, fontWeight: 900, color: "white" }}>
-                                Pivoměr nelze vložit do rámu
-                            </div>
-                            <div style={{ fontSize: 16, color: "rgba(255,255,255,0.85)", maxWidth: 640 }}>
-                                Často to způsobí blokace na cílovém webu (X-Frame-Options / CSP). Fallback je otevřít pivoměr
-                                v celé stránce.
-                            </div>
-
-                            {frameErr && (
-                                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{frameErr}</div>
-                            )}
-
-                            <button
-                                type="button"
-                                onClick={openFullscreen}
-                                style={{
-                                    padding: "10px 18px",
-                                    borderRadius: 14,
-                                    border: "none",
-                                    background: "#ff2222",
-                                    color: "white",
-                                    fontWeight: 900,
-                                    cursor: "pointer",
-                                }}
-                            >
-                                Otevřít pivoměr (fullscreen)
-                            </button>
-                        </div>
                     )}
 
                     <iframe
@@ -213,15 +118,9 @@ export default function BeerPage() {
                         style={pageStyles.frame}
                         frameBorder={0}
                         scrolling="no"
-                        // některé weby to chtějí explicitně:
                         allow="fullscreen"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        onLoad={() => setFrameState("loaded")}
-                        onError={() => {
-                            setFrameState("error");
-                            setFrameErr("Iframe onError (často CSP/X-Frame).");
-                        }}
                     />
+
                 </div>
             </div>
         </div>
