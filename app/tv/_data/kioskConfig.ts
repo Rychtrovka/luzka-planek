@@ -40,7 +40,7 @@ export const kioskConfig: KioskConfig = {
     urls: {
         weather: "https://weewx.rychtrovka.cz/ss/",
         map: "https://intmap.holidayinfo.cz/webmap.php?lang=cs&mapname=benecko&servicecode=1234",
-        beer: "http://192.168.0.25/dashboard",
+        beer: "http://192.168.0.26/dashboard",
         // ✅ snow map (Windy embed) – Benecko / Rychtrovka přibližně
         snow: "https://embed.windy.com/embed2.html?lat=50.6647602554353 &lon=15.55067082439214 &detailLat=50.6647602554353 &detailLon=15.550&width=1920&height=1080&zoom=30&level=surface&overlay=snowcover&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=kmh&metricTemp=%C2%B0C&radarRange=-1",
         //menuPdf: "https://tv.rychtrovka.cz/pdf/jidelni-listek.pdf",
