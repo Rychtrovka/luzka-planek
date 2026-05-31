@@ -3,8 +3,8 @@ export const bedPlan = [
         name: "Apartmán A – ložnice 1",
 
         beds: [
-            { id: "A-L1-1", label: "L", type: "double-left" },
-            { id: "A-L1-2", label: "P", type: "double-right" },
+            { id: "A-L1-1", label: "P", type: "double-left" },
+            { id: "A-L1-2", label: "L", type: "double-right" },
             { id: "A-L1-3", label: "R", type: "sofa-main" },
             { id: "A-L1-4", label: "r", type: "sofa-extra" },
         ],
@@ -12,18 +12,32 @@ export const bedPlan = [
     {
         name: "Apartmán A – ložnice 2 (průchozí)",
         beds: [
-            { id: "A-L2-1", label: "L", type: "double-left" },
-            { id: "A-L2-2", label: "P", type: "double-right" },
+            { id: "A-L2-1", label: "P", type: "double-left" },
+            { id: "A-L2-2", label: "L", type: "double-right" },
             { id: "A-L2-3", label: "R", type: "sofa-main" },
             { id: "A-L2-4", label: "r", type: "sofa-extra" },
+        ],
+    },
+    {
+        name: "Apartmán B – ložnice 1",
+        beds: [
+            { id: "B-L1-1", label: "S", type: "standard" },
+            { id: "B-L1-2", label: "S", type: "standard" },
+        ],
+    },
+    {
+        name: "Apartmán B – ložnice 2 (s obývacím koutem)",
+        beds: [
+            { id: "B-L2-1", label: "P", type: "double-left" },
+            { id: "B-L2-2", label: "L", type: "double-right" },
         ],
     },
 
     {
         name: "Pokoj 1 (přízemí, s vlastním sociálním zařízením)",
         beds: [
-            { id: "P1-1", label: "L", type: "double-left" },
-            { id: "P1-2", label: "P", type: "double-right" },
+            { id: "P1-1", label: "P", type: "double-left" },
+            { id: "P1-2", label: "L", type: "double-right" },
         ],
     },
     {
@@ -41,8 +55,8 @@ export const bedPlan = [
     {
         name: "Pokoj 5",
         beds: [
-            { id: "P5-1", label: "L", type: "double-left" },
-            { id: "P5-2", label: "P", type: "double-right" },
+            { id: "P5-1", label: "P", type: "double-left" },
+            { id: "P5-2", label: "L", type: "double-right" },
         ],
     },
     {
@@ -56,36 +70,23 @@ export const bedPlan = [
     {
         name: "Pokoj 7",
         beds: [
-            { id: "P7-1", label: "L", type: "double-left" },
-            { id: "P7-2", label: "P", type: "double-right" },
+            { id: "P7-1", label: "P", type: "double-left" },
+            { id: "P7-2", label: "L", type: "double-right" },
         ],
     },
     {
         name: "Pokoj 8",
         beds: [
-            { id: "P8-1", label: "L", type: "double-left" },
-            { id: "P8-2", label: "P", type: "double-right" },
+            { id: "P8-1", label: "P", type: "double-left" },
+            { id: "P8-2", label: "L", type: "double-right" },
         ],
     },
     {
         name: "Pokoj 9",
         beds: [
-            { id: "P9-1", label: "L", type: "double-left" },
-            { id: "P9-2", label: "P", type: "double-right" },
+            { id: "P9-1", label: "P", type: "double-left" },
+            { id: "P9-2", label: "L", type: "double-right" },
         ],
     },
-    {
-        name: "Apartmán B – ložnice 1",
-        beds: [
-            { id: "B-L1-1", label: "S", type: "standard" },
-            { id: "B-L1-2", label: "S", type: "standard" },
-        ],
-    },
-    {
-        name: "Apartmán B – ložnice 2 (s obývacím koutem)",
-        beds: [
-            { id: "B-L2-1", label: "L", type: "double-left" },
-            { id: "B-L2-2", label: "P", type: "double-right" },
-        ],
-    },
+
 ];
