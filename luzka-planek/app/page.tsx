@@ -354,7 +354,7 @@ export default function Home() {
 
             <div
                 style={{
-                  fontSize: "40px",
+                  fontSize: "30px",
                   fontStyle: "italic",
                   fontWeight: 700,
                   color: "#9d3d32",
@@ -368,8 +368,8 @@ export default function Home() {
               style={{
                 border: "1px solid #d9cdbb",
                 borderRadius: "12px",
-                padding: "10px",
-                marginBottom: "10px",
+                padding: "5px",
+                marginBottom: "5px",
                 background: "#f7f2e8",
                 fontSize: "18px",
               }}
