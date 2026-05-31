@@ -246,30 +246,64 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <div className="flex gap-3 flex-wrap items-center">
-                    {room.beds.map((bed) => (
-                        <button
-                            key={bed.id}
-                            onClick={() => toggleBed(bed.id)}
-                            className={[
-                              "w-20 h-14 border-2 font-bold transition",
-                              bed.type === "standard" ? "rounded-lg border-solid" : "",
-                              bed.type === "extra" ? "rounded-lg border-dashed" : "",
-                              bed.type === "double-left"
-                                  ? "rounded-l-lg rounded-r-none border-solid mr-0"
-                                  : "",
-                              bed.type === "double-right"
-                                  ? "rounded-r-lg rounded-l-none border-solid -ml-[2px]"
-                                  : "",
-                              selectedBeds[bed.id]
-                                  ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
-                                  : "bg-[var(--rb-paper)] text-[var(--rb-brown)] border-[#b9aa95]",
-                            ].join(" ")}
-                        >
-                          {bed.label}
-                        </button>
-                    ))}
-                  </div>
+                    <div className="flex gap-8 items-start">
+                        <div className="flex flex-col gap-2">
+                            {room.beds
+                                .filter(
+                                    (bed) =>
+                                        bed.type === "double-left" ||
+                                        bed.type === "double-right" ||
+                                        bed.type === "extra"
+                                )
+                                .map((bed) => (
+                                    <button
+                                        key={bed.id}
+                                        onClick={() => toggleBed(bed.id)}
+                                        className={[
+                                            "w-32 h-14 border-2 font-bold transition",
+
+                                            bed.type === "extra"
+                                                ? "rounded-lg border-dashed"
+                                                : "",
+
+                                            bed.type === "double-left"
+                                                ? "rounded-t-lg rounded-b-none border-solid mb-0"
+                                                : "",
+
+                                            bed.type === "double-right"
+                                                ? "rounded-b-lg rounded-t-none border-solid -mt-[2px]"
+                                                : "",
+
+                                            selectedBeds[bed.id]
+                                                ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
+                                                : "bg-[var(--rb-paper)] text-[var(--rb-brown)] border-[#b9aa95]",
+                                        ].join(" ")}
+                                    >
+                                        {bed.label}
+                                    </button>
+                                ))}
+                        </div>
+
+                        <div className="flex flex-col gap-5">
+                            {room.beds
+                                .filter((bed) => bed.type === "standard")
+                                .map((bed) => (
+                                    <button
+                                        key={bed.id}
+                                        onClick={() => toggleBed(bed.id)}
+                                        className={[
+                                            "w-32 h-14 border-2 font-bold transition rounded-lg border-solid",
+
+                                            selectedBeds[bed.id]
+                                                ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
+                                                : "bg-[var(--rb-paper)] text-[var(--rb-brown)] border-[#b9aa95]",
+                                        ].join(" ")}
+                                    >
+                                        {bed.label}
+                                    </button>
+                                ))}
+                        </div>
+                    </div>
                 </section>
             ))}
           </div>
