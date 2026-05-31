@@ -327,8 +327,8 @@ export default function Home() {
               position: "fixed",
               left: "-10000px",
               top: 0,
-              width: "700px",
-              padding: "25px",
+              width: "794px",
+              padding: "40px",
               background: "#fffdf8",
               color: "#46352d",
               fontFamily: "var(--font-caladea), serif",
@@ -338,7 +338,7 @@ export default function Home() {
               style={{
                 borderBottom: "4px solid #9d3d32",
                 paddingBottom: "16px",
-                marginBottom: "24px",
+                marginBottom: "14px",
               }}
           >
             <div
