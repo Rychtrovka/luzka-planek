@@ -166,10 +166,10 @@ export default function Home() {
             />
 
             <div>
-              <div className="text-sm uppercase tracking-[0.25em] text-[var(--rb-gold)] mb-2">
+                {/*              <div className="text-sm uppercase tracking-[0.25em] text-[var(--rb-gold)] mb-2">
                 Rychtrova bouda Benecko
               </div>
-
+*/}
               <h1 className="text-5xl italic font-bold text-[var(--rb-red)]">
                 Výběr lůžek
               </h1>
