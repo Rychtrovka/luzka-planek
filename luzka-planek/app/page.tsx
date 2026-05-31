@@ -166,10 +166,10 @@ export default function Home() {
             />
 
             <div>
-                {/*              <div className="text-sm uppercase tracking-[0.25em] text-[var(--rb-gold)] mb-2">
+                              <div className="text-sm uppercase tracking-[0.25em] text-[var(--rb-gold)] mb-2">
                 Rychtrova bouda Benecko
               </div>
-*/}
+
               <h1 className="text-5xl italic font-bold text-[var(--rb-red)]">
                 Výběr lůžek
               </h1>
@@ -341,7 +341,7 @@ export default function Home() {
                 marginBottom: "14px",
               }}
           >
-            <div
+              {/*}            <div
                 style={{
                   fontSize: "16px",
                   letterSpacing: "4px",
@@ -351,7 +351,7 @@ export default function Home() {
             >
               Rychtrova bouda Benecko
             </div>
-
+*/}
             <div
                 style={{
                   fontSize: "30px",
