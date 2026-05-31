@@ -439,17 +439,24 @@ export default function Home() {
                       background: "white",
                     }}
                 >
-                  <div
-                      style={{
-                        background: "#9d3d32",
-                        color: "white",
-                        padding: "3px 8px",
-                        fontSize: "17px",
-                        fontWeight: 700,
-                      }}
-                  >
-                    {room.name}
-                  </div>
+                    <div
+                        style={{
+                            background: "#9d3d32",
+                            color: "white",
+                            height: "22px",
+
+                            display: "flex",
+                            alignItems: "center",
+
+                            paddingLeft: "8px",
+                            paddingRight: "8px",
+
+                            fontSize: "13px",
+                            fontWeight: 700,
+                        }}
+                    >
+                        {room.name}
+                    </div>
 
                     <div
                         style={{
