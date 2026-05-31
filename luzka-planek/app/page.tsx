@@ -69,14 +69,18 @@ export default function Home() {
 
   function getBedPdfLabel(bed: { label: string; type: string }) {
     if (bed.type === "double-left" || bed.type === "double-right") {
-      return `..${bed.label}`;
+      return `${bed.label}`;
     }
 
-    if (bed.type === "extra") {
-      return `.${bed.label}`;
-    }
+      if (bed.type === "sofa-main") {
+          return `${bed.label}`;
+      }
 
-    return `.${bed.label}`;
+      if (bed.type === "sofa-extra") {
+          return `${bed.label}`;
+      }
+
+    return `${bed.label}`;
   }
 
   async function selectRoom(roomBeds: { id: string }[]) {
