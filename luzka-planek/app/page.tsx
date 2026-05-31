@@ -401,7 +401,7 @@ export default function Home() {
                   verticalAlign: "middle",
                 }}
             />
-            použít
+            ustlat
 
             <span
                 style={{
@@ -415,7 +415,7 @@ export default function Home() {
                   verticalAlign: "middle",
                 }}
             />
-            nepoužít
+            nechat neustlané
 
             <span style={{ marginLeft: "15px" }}>
             S = běžné, L/P = dvojlůžko, R/r = rozkládací
@@ -451,48 +451,106 @@ export default function Home() {
                     {room.name}
                   </div>
 
-                  <div
-                      style={{
-                        padding: "10px",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: "6px",
-                      }}
-                  >
-                    {room.beds.map((bed) => {
-                      const selected = selectedBeds[bed.id];
-
-                      return (
-                          <div
-                              key={bed.id}
-                              style={{
-                                width: "44px",
-                                height: "28px",
+                    <div
+                        style={{
+                            padding: "12px",
+                            display: "flex",
+                            gap: "22px",
+                            alignItems: "flex-start",
+                        }}
+                    >
+                        <div
+                            style={{
                                 display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: "12px",
-                                fontWeight: 700,
-                                border:
-                                    bed.type === "extra"
-                                        ? "2px dashed #9d3d32"
-                                        : "2px solid #9d3d32",
-                                background: selected ? "#9d3d32" : "#ffffff",
-                                color: selected ? "#ffffff" : "#46352d",
-                                borderRadius:
-                                    bed.type === "double-left"
-                                        ? "8px 0 0 8px"
-                                        : bed.type === "double-right"
-                                            ? "0 8px 8px 0"
-                                            : "8px",
-                                marginLeft: bed.type === "double-right" ? "-6px" : "0",
-                              }}
-                          >
-                            {getBedPdfLabel(bed)}
-                          </div>
-                      );
-                    })}
-                  </div>
+                                flexDirection: "column",
+                                gap: "4px",
+                            }}
+                        >
+                            {room.beds
+                                .filter(
+                                    (bed) =>
+                                        bed.type === "double-left" ||
+                                        bed.type === "double-right" ||
+                                        bed.type === "sofa-main" ||
+                                        bed.type === "sofa-extra"
+                                )
+                                .map((bed) => {
+                                    const selected = selectedBeds[bed.id];
+
+                                    return (
+                                        <div
+                                            key={bed.id}
+                                            style={{
+                                                width: "72px",
+                                                height: "30px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "12px",
+                                                fontWeight: 700,
+
+                                                border:
+                                                    bed.type === "sofa-extra"
+                                                        ? "2px dashed #9d3d32"
+                                                        : "2px solid #9d3d32",
+
+                                                background: selected ? "#9d3d32" : "#ffffff",
+                                                color: selected ? "#ffffff" : "#46352d",
+
+                                                borderRadius:
+                                                    bed.type === "double-left" || bed.type === "sofa-main"
+                                                        ? "8px 8px 0 0"
+                                                        : bed.type === "double-right" || bed.type === "sofa-extra"
+                                                            ? "0 0 8px 8px"
+                                                            : "8px",
+
+                                                marginTop:
+                                                    bed.type === "double-right" || bed.type === "sofa-extra"
+                                                        ? "-6px"
+                                                        : "0",
+                                            }}
+                                        >
+                                            {getBedPdfLabel(bed)}
+                                        </div>
+                                    );
+                                })}
+                        </div>
+
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "12px",
+                            }}
+                        >
+                            {room.beds
+                                .filter((bed) => bed.type === "standard")
+                                .map((bed) => {
+                                    const selected = selectedBeds[bed.id];
+
+                                    return (
+                                        <div
+                                            key={bed.id}
+                                            style={{
+                                                width: "72px",
+                                                height: "30px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "12px",
+                                                fontWeight: 700,
+                                                border: "2px solid #9d3d32",
+                                                borderRadius: "8px",
+                                                background: selected ? "#9d3d32" : "#ffffff",
+                                                color: selected ? "#ffffff" : "#46352d",
+                                            }}
+                                        >
+                                            {getBedPdfLabel(bed)}
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    </div>
                 </div>
             ))}
           </div>
