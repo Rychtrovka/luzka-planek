@@ -328,7 +328,7 @@ export default function Home() {
               left: "-10000px",
               top: 0,
               width: "794px",
-              padding: "40px",
+              padding: "20px",
               background: "#fffdf8",
               color: "#46352d",
               fontFamily: "var(--font-caladea), serif",
