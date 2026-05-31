@@ -114,68 +114,6 @@ export default function Home() {
     );
   }
 
-  function exportPdf() {
-    const doc = new jsPDF();
-
-    let y = 20;
-
-    doc.setFontSize(20);
-    doc.text("RYCHTROVA BOUDA BENECKO", 20, y);
-
-    y += 15;
-
-    doc.setFontSize(14);
-    doc.text("Pozadavek na vyuziti luzek", 20, y);
-
-    y += 15;
-
-    doc.text(`${firstName} ${lastName}`, 20, y);
-
-    y += 10;
-
-    doc.text(`Termin: ${stayFrom} - ${stayTo}`, 20, y);
-
-    y += 15;
-
-    bedPlan.forEach((room) => {
-      const selected = room.beds.filter(
-          (bed) => selectedBeds[bed.id]
-      );
-
-      if (selected.length === 0) return;
-
-      doc.setFontSize(13);
-      doc.text(room.name, 20, y);
-
-      y += 8;
-
-      doc.setFontSize(11);
-
-      selected.forEach((bed) => {
-        doc.text(`• ${bed.label}`, 30, y);
-        y += 6;
-      });
-
-      y += 4;
-
-      if (y > 260) {
-        doc.addPage();
-        y = 20;
-      }
-    });
-
-    y += 10;
-
-    doc.setFontSize(10);
-
-    doc.text(
-        `Vytvoreno: ${new Date().toLocaleString("cs-CZ")}`,
-        20,
-        y
-    );
-
-    doc.save("pozadavek-na-luzka.pdf");
-  }
 
   async function clearRoom(roomBeds: { id: string }[]) {
     const next = { ...selectedBeds };
