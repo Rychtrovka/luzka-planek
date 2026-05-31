@@ -69,14 +69,14 @@ export default function Home() {
 
   function getBedPdfLabel(bed: { label: string; type: string }) {
     if (bed.type === "double-left" || bed.type === "double-right") {
-      return `D${bed.label}`;
+      return `..${bed.label}`;
     }
 
     if (bed.type === "extra") {
-      return `R${bed.label}`;
+      return `.${bed.label}`;
     }
 
-    return `S${bed.label}`;
+    return `.${bed.label}`;
   }
 
   async function selectRoom(roomBeds: { id: string }[]) {
@@ -130,7 +130,7 @@ export default function Home() {
     const height = (canvas.height * width) / canvas.width;
 
     pdf.addImage(imgData, "PNG", margin, margin, width, height);
-    pdf.save("pozadavek-na-luzka.pdf");
+    pdf.save("luzka.pdf");
   }
 
   return (
@@ -209,12 +209,12 @@ export default function Home() {
               <div className="flex items-center gap-0">
                 <span className="w-6 h-5 border-2 border-neutral-400 rounded-l bg-white" />
                 <span className="w-6 h-5 border-2 border-neutral-400 rounded-r bg-white -ml-px" />
-                <span className="ml-2">dvojlůžko (D)</span>
+                <span className="ml-2">dvojlůžko (L+P)</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="w-8 h-5 border-2 border-dashed border-neutral-400 rounded bg-white" />
-                <span>rozkládací lůžko (R)</span>
+                <span>rozkládací lůžko (R+r)</span>
               </div>
             </div>
           </section>
