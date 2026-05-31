@@ -387,14 +387,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ fontSize: "14px", marginBottom: "16px" }}>
+          <div style={{ fontSize: "14px", marginBottom: "10px" }}>
             <strong>Legenda:</strong>
 
             <span
                 style={{
                   display: "inline-block",
                   width: "20px",
-                  height: "14px",
+                  height: "12px",
                   background: "#9d3d32",
                   marginLeft: "10px",
                   marginRight: "5px",
@@ -407,7 +407,7 @@ export default function Home() {
                 style={{
                   display: "inline-block",
                   width: "20px",
-                  height: "14px",
+                  height: "12px",
                   border: "2px solid #9d3d32",
                   background: "white",
                   marginLeft: "15px",
