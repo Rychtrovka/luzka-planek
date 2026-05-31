@@ -8,34 +8,6 @@ import Image from "next/image";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
-async function exportPdf() {
-  const element = document.getElementById("pdf-content");
-
-  if (!element) return;
-
-  const canvas = await html2canvas(element, {
-    scale: 2,
-  });
-
-  const imgData = canvas.toDataURL("image/png");
-
-  const pdf = new jsPDF("p", "mm", "a4");
-
-  const width = 190;
-  const height = (canvas.height * width) / canvas.width;
-
-  pdf.addImage(
-      imgData,
-      "PNG",
-      10,
-      10,
-      width,
-      height
-  );
-
-  pdf.save("pozadavek-na-luzka.pdf");
-}
-
 export default function Home() {
   const [selectedBeds, setSelectedBeds] = useState<Record<string, boolean>>({});
   const [firstName, setFirstName] = useState("");
@@ -73,6 +45,7 @@ export default function Home() {
         { merge: true }
     );
   }
+
   function getSelectedCount() {
     return Object.values(selectedBeds).filter(Boolean).length;
   }
@@ -89,13 +62,21 @@ export default function Home() {
   function getRoomClass(roomBeds: { id: string }[]) {
     const status = getRoomStatus(roomBeds);
 
-    if (status === "empty")
-      return "bg-[var(--rb-paper)] border-[#d9cdbb]";
+    if (status === "empty") return "bg-white/55 border-[#d9cdbb]";
+    if (status === "partial") return "bg-[#fff5dc]/70 border-[var(--rb-gold)]";
+    return "bg-[#f4e2dc]/70 border-[var(--rb-red)]";
+  }
 
-    if (status === "partial")
-      return "bg-[#fff5dc] border-[var(--rb-gold)]";
+  function getBedPdfLabel(bed: { label: string; type: string }) {
+    if (bed.type === "double-left" || bed.type === "double-right") {
+      return `D${bed.label}`;
+    }
 
-    return "bg-[#f4e2dc] border-[var(--rb-red)]";
+    if (bed.type === "extra") {
+      return `R${bed.label}`;
+    }
+
+    return `S${bed.label}`;
   }
 
   async function selectRoom(roomBeds: { id: string }[]) {
@@ -114,7 +95,6 @@ export default function Home() {
     );
   }
 
-
   async function clearRoom(roomBeds: { id: string }[]) {
     const next = { ...selectedBeds };
 
@@ -131,9 +111,37 @@ export default function Home() {
     );
   }
 
+  async function exportPdf() {
+    const element = document.getElementById("pdf-content");
+
+    if (!element) return;
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: "#fffdf8",
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = 210;
+    const margin = 10;
+    const width = pageWidth - margin * 2;
+    const height = (canvas.height * width) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", margin, margin, width, height);
+    pdf.save("pozadavek-na-luzka.pdf");
+  }
+
+  const selectedRooms = bedPlan
+      .map((room) => ({
+        ...room,
+        selected: room.beds.filter((bed) => selectedBeds[bed.id]),
+      }))
+      .filter((room) => room.selected.length > 0);
+
   return (
       <main
-
           className="min-h-screen p-8"
           style={{
             backgroundImage: "url('/rychtrovka-bg.png')",
@@ -142,7 +150,6 @@ export default function Home() {
             backgroundRepeat: "no-repeat",
           }}
       >
-        <div id="pdf-content">
         <div
             className="fixed inset-0 z-0"
             style={{
@@ -152,177 +159,248 @@ export default function Home() {
         />
 
         <div className="relative z-10">
-        <header className="max-w-6xl mx-auto mb-8 flex items-center gap-5">
-          <Image
-              src="/logo-rb.png"
-              alt="Rychtrova bouda"
-              width={96}
-              height={96}
-              className="rounded-xl"
-          />
+          <header className="max-w-6xl mx-auto mb-8 flex items-center gap-5">
+            <Image
+                src="/logo-rb.png"
+                alt="Rychtrova bouda"
+                width={96}
+                height={96}
+                className="rounded-xl"
+            />
 
-          <div>
-            <div className="text-sm uppercase tracking-[0.25em] text-[var(--rb-gold)] mb-2">
+            <div>
+              <div className="text-sm uppercase tracking-[0.25em] text-[var(--rb-gold)] mb-2">
+                Rychtrova bouda Benecko
+              </div>
+
+              <h1 className="text-5xl italic font-bold text-[var(--rb-red)]">
+                Výběr lůžek
+              </h1>
+
+              <p className="text-sm text-[var(--rb-brown)] mt-2 mb-4">
+                Označte prosím lůžka, která budete během pobytu používat.
+              </p>
+
+              <button
+                  onClick={exportPdf}
+                  className="bg-[var(--rb-red)] text-white rounded px-4 py-2 font-semibold"
+              >
+                Export PDF
+              </button>
+            </div>
+          </header>
+
+          <section className="bg-white/55 rounded-xl p-4 shadow-lg border border-[#d9cdbb] mb-6 max-w-3xl">
+            <div className="text-lg font-semibold">
+              {firstName} {lastName}
+            </div>
+
+            <div className="text-neutral-600">
+              Termín pobytu: {stayFrom} – {stayTo}
+            </div>
+          </section>
+
+          <section className="bg-white/55 rounded-xl p-4 shadow-lg border border-[#d9cdbb] mb-6 max-w-3xl">
+            <div className="font-semibold mb-2">
+              Vybráno lůžek: {getSelectedCount()}
+            </div>
+
+            <div className="flex gap-4 flex-wrap text-sm">
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-5 border-2 border-neutral-400 rounded bg-white" />
+                <span>běžné lůžko (S)</span>
+              </div>
+
+              <div className="flex items-center gap-0">
+                <span className="w-6 h-5 border-2 border-neutral-400 rounded-l bg-white" />
+                <span className="w-6 h-5 border-2 border-neutral-400 rounded-r bg-white -ml-px" />
+                <span className="ml-2">dvojlůžko (D)</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-5 border-2 border-dashed border-neutral-400 rounded bg-white" />
+                <span>rozkládací lůžko (R)</span>
+              </div>
+            </div>
+          </section>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {bedPlan.map((room) => (
+                <section
+                    key={room.name}
+                    className={[
+                      "rounded-xl p-4 shadow border-2 transition",
+                      getRoomClass(room.beds),
+                    ].join(" ")}
+                >
+                  <h2 className="text-xl font-semibold mb-2">{room.name}</h2>
+
+                  <div className="flex gap-2 mb-4">
+                    <button
+                        onClick={() => selectRoom(room.beds)}
+                        className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-semibold"
+                    >
+                      Vybrat všechna lůžka
+                    </button>
+
+                    <button
+                        onClick={() => clearRoom(room.beds)}
+                        className="text-sm bg-[var(--rb-red)] text-white rounded px-3 py-1 font-semibold"
+                    >
+                      Vymazat
+                    </button>
+                  </div>
+
+                  <div className="flex gap-3 flex-wrap items-center">
+                    {room.beds.map((bed) => (
+                        <button
+                            key={bed.id}
+                            onClick={() => toggleBed(bed.id)}
+                            className={[
+                              "w-20 h-14 border-2 font-bold transition",
+                              bed.type === "standard" ? "rounded-lg border-solid" : "",
+                              bed.type === "extra" ? "rounded-lg border-dashed" : "",
+                              bed.type === "double-left"
+                                  ? "rounded-l-lg rounded-r-none border-solid mr-0"
+                                  : "",
+                              bed.type === "double-right"
+                                  ? "rounded-r-lg rounded-l-none border-solid -ml-[2px]"
+                                  : "",
+                              selectedBeds[bed.id]
+                                  ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
+                                  : "bg-[var(--rb-paper)] text-[var(--rb-brown)] border-[#b9aa95]",
+                            ].join(" ")}
+                        >
+                          {bed.label}
+                        </button>
+                    ))}
+                  </div>
+                </section>
+            ))}
+          </div>
+        </div>
+
+        <div
+            id="pdf-content"
+            style={{
+              position: "fixed",
+              left: "-10000px",
+              top: 0,
+              width: "794px",
+              padding: "40px",
+              background: "#fffdf8",
+              color: "#46352d",
+              fontFamily: "var(--font-caladea), serif",
+            }}
+        >
+          <div
+              style={{
+                borderBottom: "4px solid #9d3d32",
+                paddingBottom: "16px",
+                marginBottom: "24px",
+              }}
+          >
+            <div
+                style={{
+                  fontSize: "16px",
+                  letterSpacing: "4px",
+                  textTransform: "uppercase",
+                  color: "#b8903c",
+                }}
+            >
               Rychtrova bouda Benecko
             </div>
 
-            <h1 className="text-5xl italic font-bold text-[var(--rb-red)]">
-              Výběr lůžek
-            </h1>
-
-            <p className="text-sm text-[var(--rb-brown)] mt-2">
-              Označte prosím lůžka, která budete během pobytu používat.
-            </p>
-            <button
-                onClick={exportPdf}
-                className="
-    bg-[var(--rb-red)]
-    text-white
-    rounded
-    px-4
-    py-2
-    font-semibold
-  "
+            <div
+                style={{
+                  fontSize: "42px",
+                  fontStyle: "italic",
+                  fontWeight: 700,
+                  color: "#9d3d32",
+                }}
             >
-              Export PDF
-            </button>
-          </div>
-        </header>
-
-
-
-          <section className="
-  bg-[rgba(255,253,248,0.55)]
-
-  rounded-xl
-  p-4
-  shadow-lg
-  border
-  border-[#d9cdbb]
-  mb-6
-  max-w-3xl
-">
-          <div className="text-lg font-semibold">
-            {firstName} {lastName}
-          </div>
-
-          <div className="text-neutral-600">
-            Termín pobytu: {stayFrom} – {stayTo}
-          </div>
-        </section>
-
-          <section className="
-  bg-[rgba(255,253,248,0.55)]
-
-  rounded-xl
-  p-4
-  shadow-lg
-  border
-  border-[#d9cdbb]
-  mb-6
-  max-w-3xl
-">
-          <div className="font-semibold mb-2">
-            Vybráno lůžek: {getSelectedCount()}
-          </div>
-
-          <div className="flex gap-4 flex-wrap text-sm">
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-5 border-2 border-neutral-400 rounded bg-white" />
-              <span>běžné lůžko (S) </span>
-            </div>
-
-            <div className="flex items-center gap-0">
-              <span className="w-6 h-5 border-2 border-neutral-400 rounded-l bg-white" />
-              <span className="w-6 h-5 border-2 border-neutral-400 rounded-r bg-white -ml-px" />
-              <span className="ml-2">dvojlůžko (D1+2)</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-5 border-2 border-dashed border-neutral-400 rounded bg-white" />
-              <span>rozkládací lůžko (R+r)</span>
+              Požadavek na využití lůžek
             </div>
           </div>
-        </section>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {bedPlan.map((room) => (
-              <section
-                  key={room.name}
-                  className={[
-                    "rounded-xl p-4 shadow border-2 transition bg-white/55",
-                    getRoomClass(room.beds),
-                  ].join(" ")}
-              >
-                <h2 className="text-xl font-semibold mb-2">{room.name}</h2>
+          <div
+              style={{
+                border: "1px solid #d9cdbb",
+                borderRadius: "12px",
+                padding: "18px",
+                marginBottom: "24px",
+                background: "#f7f2e8",
+                fontSize: "20px",
+              }}
+          >
+            <div>
+              <strong>Host:</strong> {firstName} {lastName}
+            </div>
+            <div>
+              <strong>Termín pobytu:</strong> {stayFrom} – {stayTo}
+            </div>
+            <div>
+              <strong>Vybráno lůžek:</strong> {getSelectedCount()}
+            </div>
+          </div>
 
-                <div className="flex gap-2 mb-4">
-                  <button
-                      onClick={() => selectRoom(room.beds)}
-                      className="text-sm
-bg-[var(--rb-gold)]
-text-white
-rounded
-px-3
-py-1
-font-semibold
-"
+          <div style={{ fontSize: "16px", marginBottom: "18px" }}>
+            <strong>Legenda:</strong> S = běžné lůžko, D = dvojlůžko, R =
+            rozkládací lůžko
+          </div>
+
+          {selectedRooms.length === 0 ? (
+              <div style={{ fontSize: "20px" }}>Nejsou vybrána žádná lůžka.</div>
+          ) : (
+              selectedRooms.map((room) => (
+                  <div
+                      key={room.name}
+                      style={{
+                        border: "1px solid #d9cdbb",
+                        borderRadius: "10px",
+                        marginBottom: "14px",
+                        overflow: "hidden",
+                      }}
                   >
-                    Vybrat všechna lůžka
-                  </button>
+                    <div
+                        style={{
+                          background: "#9d3d32",
+                          color: "white",
+                          padding: "8px 12px",
+                          fontSize: "20px",
+                          fontWeight: 700,
+                        }}
+                    >
+                      {room.name}
+                    </div>
 
-                  <button
-                      onClick={() => clearRoom(room.beds)}
-                      className="
-text-sm
-bg-[var(--rb-red)]
-text-white
-rounded
-px-3
-py-1
-font-semibold
-"
-                  >
-                    Vymazat
-                  </button>
-                </div>
-                <div className="flex gap-3 flex-wrap items-center">
-                  {room.beds.map((bed) => (
-                      <button
-                          key={bed.id}
-                          onClick={() => toggleBed(bed.id)}
-                          className={[
-                            "w-20 h-14 border-2 font-bold transition",
+                    <div
+                        style={{
+                          padding: "12px",
+                          fontSize: "18px",
+                          background: "white",
+                        }}
+                    >
+                      {room.selected.map(getBedPdfLabel).join(", ")}
+                    </div>
+                  </div>
+              ))
+          )}
 
-                            bed.type === "standard"
-                                ? "rounded-lg border-solid"
-                                : "",
-
-                            bed.type === "extra"
-                                ? "rounded-lg border-dashed"
-                                : "",
-
-                            bed.type === "double-left"
-                                ? "rounded-l-lg rounded-r-none border-solid mr-0"
-                                : "",
-
-                            bed.type === "double-right"
-                                ? "rounded-r-lg rounded-l-none border-solid -ml-3"
-                                : "",
-
-                            selectedBeds[bed.id]
-                                ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
-                                : "bg-[var(--rb-paper)] text-[var(--rb-brown)] border-[#b9aa95]"
-                          ].join(" ")}
-                      >
-                        {bed.label}
-                      </button>
-                  ))}
-                </div>
-              </section>
-          ))}
-        </div>
-        </div>
+          <div
+              style={{
+                marginTop: "32px",
+                paddingTop: "12px",
+                borderTop: "1px solid #d9cdbb",
+                fontSize: "13px",
+                color: "#705f55",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+          >
+            <span>Vytvořeno: {new Date().toLocaleString("cs-CZ")}</span>
+            <span>RychterIS · Rychtrova bouda</span>
+          </div>
         </div>
       </main>
   );
