@@ -14,8 +14,8 @@ export const bedPlan = [
         beds: [
             { id: "A-L2-1", label: "P", type: "double-left" },
             { id: "A-L2-2", label: "L", type: "double-right" },
-            { id: "A-L2-3", label: "R", type: "sofa-main" },
-            { id: "A-L2-4", label: "r", type: "sofa-extra" },
+            { id: "A-L2-3", label: "S", type: "standard" },
+            { id: "A-L2-4", label: "S", type: "standard" },
         ],
     },
     {
