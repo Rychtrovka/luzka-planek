@@ -26,7 +26,7 @@ export const bedPlan = [
         ],
     },
     {
-        name: "Apartmán B – ložnice 2 (s obývacím koutem)",
+        name: "Apartmán B – ložnice 2 (obývací)",
         beds: [
             { id: "B-L2-1", label: "P", type: "double-left" },
             { id: "B-L2-2", label: "L", type: "double-right" },
@@ -34,7 +34,7 @@ export const bedPlan = [
     },
 
     {
-        name: "Pokoj 1 (přízemí, s vlastním sociálním zařízením)",
+        name: "Pokoj 1 (přízemí, s koupelnou)",
         beds: [
             { id: "P1-1", label: "P", type: "double-left" },
             { id: "P1-2", label: "L", type: "double-right" },
