@@ -368,8 +368,8 @@ export default function Home() {
               style={{
                 border: "1px solid #d9cdbb",
                 borderRadius: "12px",
-                padding: "16px",
-                marginBottom: "18px",
+                padding: "10px",
+                marginBottom: "10px",
                 background: "#f7f2e8",
                 fontSize: "18px",
               }}
