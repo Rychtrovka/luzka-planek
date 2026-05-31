@@ -273,6 +273,13 @@ export default function Home() {
                                             bed.type === "double-right"
                                                 ? "rounded-b-lg rounded-t-none border-solid -mt-[2px]"
                                                 : "",
+                                            bed.type === "sofa-main"
+                                                ? "rounded-t-lg rounded-b-none border-solid"
+                                                : "",
+
+                                            bed.type === "sofa-extra"
+                                                ? "rounded-b-lg rounded-t-none border-dashed -mt-[2px]"
+                                                : "",
 
                                             selectedBeds[bed.id]
                                                 ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
@@ -286,7 +293,13 @@ export default function Home() {
 
                         <div className="flex flex-col gap-5">
                             {room.beds
-                                .filter((bed) => bed.type === "standard")
+                                .filter(
+                                    (bed) =>
+                                        bed.type === "double-left" ||
+                                        bed.type === "double-right" ||
+                                        bed.type === "sofa-main" ||
+                                        bed.type === "sofa-extra"
+                                )
                                 .map((bed) => (
                                     <button
                                         key={bed.id}

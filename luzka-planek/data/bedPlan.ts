@@ -5,8 +5,8 @@ export const bedPlan = [
         beds: [
             { id: "A-L1-1", label: "L", type: "double-left" },
             { id: "A-L1-2", label: "P", type: "double-right" },
-            { id: "A-L1-3", label: "R", type: "standard" },
-            { id: "A-L1-4", label: "r", type: "extra" },
+            { id: "A-L1-3", label: "R", type: "sofa-main" },
+            { id: "A-L1-4", label: "r", type: "sofa-extra" },
         ],
     },
     {
@@ -14,8 +14,8 @@ export const bedPlan = [
         beds: [
             { id: "A-L2-1", label: "L", type: "double-left" },
             { id: "A-L2-2", label: "P", type: "double-right" },
-            { id: "A-L2-3", label: "R", type: "standard" },
-            { id: "A-L2-4", label: "r", type: "extra" },
+            { id: "A-L2-3", label: "R", type: "sofa-main" },
+            { id: "A-L2-4", label: "r", type: "sofa-extra" },
         ],
     },
 
@@ -32,10 +32,10 @@ export const bedPlan = [
             { id: "P3-1", label: "S", type: "standard" },
             { id: "P3-2", label: "S", type: "standard" },
             { id: "P3-3", label: "S", type: "standard" },
-            { id: "P3-4", label: "R", type: "standard" },
-            { id: "P3-5", label: "r", type: "extra" },
-            { id: "P3-6", label: "R", type: "standard" },
-            { id: "P3-7", label: "r", type: "extra" },
+            { id: "P3-4", label: "R", type: "sofa-main" },
+            { id: "P3-5", label: "r", type: "sofa-extra" },
+            { id: "P3-6", label: "R", type: "sofa-main" },
+            { id: "P3-7", label: "r", type: "sofa-extra" },
         ],
     },
     {
@@ -49,8 +49,8 @@ export const bedPlan = [
         name: "Pokoj 6",
         beds: [
             { id: "P6-1", label: "S", type: "standard" },
-            { id: "P6-2", label: "R", type: "standard" },
-            { id: "P6-3", label: "r", type: "extra" },
+            { id: "P6-2", label: "R", type: "sofa-main" },
+            { id: "P6-3", label: "r", type: "sofa-extra" },
         ],
     },
     {
