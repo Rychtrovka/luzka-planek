@@ -189,7 +189,9 @@ export default function Home() {
             </div>
 
             <div className="text-neutral-600">
-              Termín pobytu: {stayFrom} – {stayTo}
+              <strong>Termín pobytu:</strong>{" "}
+              {new Date(stayFrom).toLocaleDateString("cs-CZ")} –{" "}
+              {new Date(stayTo).toLocaleDateString("cs-CZ")}
             </div>
           </section>
 
@@ -330,7 +332,9 @@ export default function Home() {
               <strong>Host:</strong> {firstName} {lastName}
             </div>
             <div>
-              <strong>Termín pobytu:</strong> {stayFrom} – {stayTo}
+              <strong>Termín pobytu:</strong>{" "}
+              {new Date(stayFrom).toLocaleDateString("cs-CZ")} –{" "}
+              {new Date(stayTo).toLocaleDateString("cs-CZ")}
             </div>
             <div>
               <strong>Vybráno lůžek:</strong> {getSelectedCount()}
@@ -368,7 +372,7 @@ export default function Home() {
             nepoužít
 
             <span style={{ marginLeft: "15px" }}>
-            S = běžné, D = dvojlůžko, R = rozkládací
+            S = běžné, L/P = dvojlůžko, R = rozkládací
           </span>
           </div>
 

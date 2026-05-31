@@ -57,7 +57,7 @@ export const bedPlan = [
         name: "Pokoj 7",
         beds: [
             { id: "P7-1", label: "L", type: "double-left" },
-            { id: "P7-2", label: "P", type: "sdouble-right" },
+            { id: "P7-2", label: "P", type: "double-right" },
         ],
     },
     {
