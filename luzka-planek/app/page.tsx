@@ -443,7 +443,7 @@ export default function Home() {
                       style={{
                         background: "#9d3d32",
                         color: "white",
-                        padding: "7px 5px",
+                        padding: "3px 8px",
                         fontSize: "17px",
                         fontWeight: 700,
                       }}
@@ -455,7 +455,7 @@ export default function Home() {
                         style={{
                             padding: "12px",
                             display: "flex",
-                            gap: "22px",
+                            gap: "15px",
                             alignItems: "flex-start",
                         }}
                     >
