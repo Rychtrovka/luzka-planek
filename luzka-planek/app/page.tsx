@@ -5,7 +5,36 @@ import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { bedPlan } from "@/data/bedPlan";
 import Image from "next/image";
+import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+
+async function exportPdf() {
+  const element = document.getElementById("pdf-content");
+
+  if (!element) return;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const width = 190;
+  const height = (canvas.height * width) / canvas.width;
+
+  pdf.addImage(
+      imgData,
+      "PNG",
+      10,
+      10,
+      width,
+      height
+  );
+
+  pdf.save("pozadavek-na-luzka.pdf");
+}
 
 export default function Home() {
   const [selectedBeds, setSelectedBeds] = useState<Record<string, boolean>>({});
@@ -88,100 +117,62 @@ export default function Home() {
   function exportPdf() {
     const doc = new jsPDF();
 
-    const rbRed = [157, 61, 50] as const;
-    const rbGold = [184, 144, 60] as const;
-    const rbBrown = [70, 53, 45] as const;
-    const rbCream = [247, 242, 232] as const;
-    const rbPaper = [255, 253, 248] as const;
-
     let y = 20;
 
-    doc.setFillColor(...rbRed);
-    doc.rect(0, 0, 210, 28, "F");
-
-    doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
-    doc.text("Rychtrova bouda Benecko", 20, 18);
+    doc.text("RYCHTROVA BOUDA BENECKO", 20, y);
 
-    doc.setTextColor(...rbBrown);
-    doc.setFontSize(15);
-    doc.text("Požadavek na využití lůžek", 20, 42);
+    y += 15;
 
-    doc.setDrawColor(...rbGold);
-    doc.setFillColor(...rbPaper);
-    doc.roundedRect(20, 50, 170, 28, 3, 3, "FD");
+    doc.setFontSize(14);
+    doc.text("Pozadavek na vyuziti luzek", 20, y);
 
-    doc.setFontSize(12);
-    doc.text(`Host: ${firstName} ${lastName}`.trim(), 28, 62);
-    doc.text(`Termín pobytu: ${stayFrom} – ${stayTo}`, 28, 72);
+    y += 15;
 
-    y = 92;
+    doc.text(`${firstName} ${lastName}`, 20, y);
 
-    doc.setFontSize(10);
-    doc.setTextColor(...rbBrown);
-    doc.text("Legenda: S = samostatné lůžko, D = dvojlůžko, R = rozkládací lůžko", 20, y);
+    y += 10;
 
-    y += 12;
+    doc.text(`Termin: ${stayFrom} - ${stayTo}`, 20, y);
 
-    let hasAnySelectedBed = false;
+    y += 15;
 
     bedPlan.forEach((room) => {
-      const selected = room.beds.filter((bed) => selectedBeds[bed.id] === true);
+      const selected = room.beds.filter(
+          (bed) => selectedBeds[bed.id]
+      );
 
       if (selected.length === 0) return;
 
-      hasAnySelectedBed = true;
+      doc.setFontSize(13);
+      doc.text(room.name, 20, y);
 
-      if (y > 250) {
+      y += 8;
+
+      doc.setFontSize(11);
+
+      selected.forEach((bed) => {
+        doc.text(`• ${bed.label}`, 30, y);
+        y += 6;
+      });
+
+      y += 4;
+
+      if (y > 260) {
         doc.addPage();
         y = 20;
       }
-
-      doc.setFillColor(...rbCream);
-      doc.setDrawColor(...rbGold);
-      doc.roundedRect(20, y, 170, 10, 2, 2, "FD");
-
-      doc.setTextColor(...rbRed);
-      doc.setFontSize(12);
-      doc.text(room.name, 26, y + 7);
-
-      y += 16;
-
-      doc.setTextColor(...rbBrown);
-      doc.setFontSize(11);
-
-      const labels = selected.map((bed) => {
-        let prefix = "S";
-
-        if (bed.type === "double-left" || bed.type === "double-right") {
-          prefix = "D";
-        }
-
-        if (bed.type === "extra") {
-          prefix = "R";
-        }
-
-        return `${prefix}${bed.label}`;
-      });
-
-      doc.text(`Vybraná lůžka: ${labels.join(", ")}`, 28, y);
-
-      y += 12;
     });
 
-    if (!hasAnySelectedBed) {
-      doc.setFontSize(12);
-      doc.text("Nejsou vybrána žádná lůžka.", 20, y);
-      y += 12;
-    }
+    y += 10;
 
-    doc.setDrawColor(217, 205, 187);
-    doc.line(20, 280, 190, 280);
+    doc.setFontSize(10);
 
-    doc.setTextColor(120, 100, 85);
-    doc.setFontSize(9);
-    doc.text(`Vytvořeno: ${new Date().toLocaleString("cs-CZ")}`, 20, 287);
-    doc.text("RychterIS · Rychtrova bouda", 140, 287);
+    doc.text(
+        `Vytvoreno: ${new Date().toLocaleString("cs-CZ")}`,
+        20,
+        y
+    );
 
     doc.save("pozadavek-na-luzka.pdf");
   }
@@ -213,7 +204,7 @@ export default function Home() {
             backgroundRepeat: "no-repeat",
           }}
       >
-
+        <div id="pdf-content">
         <div
             className="fixed inset-0 z-0"
             style={{
@@ -392,6 +383,7 @@ font-semibold
                 </div>
               </section>
           ))}
+        </div>
         </div>
         </div>
       </main>
