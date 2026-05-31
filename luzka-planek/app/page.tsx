@@ -369,7 +369,7 @@ export default function Home() {
                 border: "1px solid #d9cdbb",
                 borderRadius: "12px",
                 padding: "5px",
-                marginBottom: "5px",
+                marginBottom: "10px",
                 background: "#f7f2e8",
                 fontSize: "18px",
               }}
@@ -443,7 +443,7 @@ export default function Home() {
                       style={{
                         background: "#9d3d32",
                         color: "white",
-                        padding: "7px 10px",
+                        padding: "7px 5px",
                         fontSize: "17px",
                         fontWeight: 700,
                       }}
