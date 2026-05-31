@@ -253,7 +253,8 @@ export default function Home() {
                                     (bed) =>
                                         bed.type === "double-left" ||
                                         bed.type === "double-right" ||
-                                        bed.type === "extra"
+                                        bed.type === "sofa-main" ||
+                                        bed.type === "sofa-extra"
                                 )
                                 .map((bed) => (
                                     <button
@@ -293,13 +294,7 @@ export default function Home() {
 
                         <div className="flex flex-col gap-5">
                             {room.beds
-                                .filter(
-                                    (bed) =>
-                                        bed.type === "double-left" ||
-                                        bed.type === "double-right" ||
-                                        bed.type === "sofa-main" ||
-                                        bed.type === "sofa-extra"
-                                )
+                                .filter((bed) => bed.type === "standard")
                                 .map((bed) => (
                                     <button
                                         key={bed.id}
@@ -419,7 +414,7 @@ export default function Home() {
             nepoužít
 
             <span style={{ marginLeft: "15px" }}>
-            S = běžné, L/P = dvojlůžko, R = rozkládací
+            S = běžné, L/P = dvojlůžko, R/r = rozkládací
           </span>
           </div>
 
