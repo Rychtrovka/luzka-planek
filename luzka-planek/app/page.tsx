@@ -133,13 +133,6 @@ export default function Home() {
     pdf.save("pozadavek-na-luzka.pdf");
   }
 
-  const selectedRooms = bedPlan
-      .map((room) => ({
-        ...room,
-        selected: room.beds.filter((bed) => selectedBeds[bed.id]),
-      }))
-      .filter((room) => room.selected.length > 0);
-
   return (
       <main
           className="min-h-screen p-8"
@@ -313,7 +306,7 @@ export default function Home() {
 
             <div
                 style={{
-                  fontSize: "42px",
+                  fontSize: "40px",
                   fontStyle: "italic",
                   fontWeight: 700,
                   color: "#9d3d32",
@@ -327,10 +320,10 @@ export default function Home() {
               style={{
                 border: "1px solid #d9cdbb",
                 borderRadius: "12px",
-                padding: "18px",
-                marginBottom: "24px",
+                padding: "16px",
+                marginBottom: "18px",
                 background: "#f7f2e8",
-                fontSize: "20px",
+                fontSize: "18px",
               }}
           >
             <div>
@@ -344,55 +337,122 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ fontSize: "16px", marginBottom: "18px" }}>
-            <strong>Legenda:</strong> S = běžné lůžko, D = dvojlůžko, R =
-            rozkládací lůžko
+          <div style={{ fontSize: "14px", marginBottom: "16px" }}>
+            <strong>Legenda:</strong>
+
+            <span
+                style={{
+                  display: "inline-block",
+                  width: "20px",
+                  height: "14px",
+                  background: "#9d3d32",
+                  marginLeft: "10px",
+                  marginRight: "5px",
+                  verticalAlign: "middle",
+                }}
+            />
+            použít
+
+            <span
+                style={{
+                  display: "inline-block",
+                  width: "20px",
+                  height: "14px",
+                  border: "2px solid #9d3d32",
+                  background: "white",
+                  marginLeft: "15px",
+                  marginRight: "5px",
+                  verticalAlign: "middle",
+                }}
+            />
+            nepoužít
+
+            <span style={{ marginLeft: "15px" }}>
+            S = běžné, D = dvojlůžko, R = rozkládací
+          </span>
           </div>
-
-          {selectedRooms.length === 0 ? (
-              <div style={{ fontSize: "20px" }}>Nejsou vybrána žádná lůžka.</div>
-          ) : (
-              selectedRooms.map((room) => (
-                  <div
-                      key={room.name}
-                      style={{
-                        border: "1px solid #d9cdbb",
-                        borderRadius: "10px",
-                        marginBottom: "14px",
-                        overflow: "hidden",
-                      }}
-                  >
-                    <div
-                        style={{
-                          background: "#9d3d32",
-                          color: "white",
-                          padding: "8px 12px",
-                          fontSize: "20px",
-                          fontWeight: 700,
-                        }}
-                    >
-                      {room.name}
-                    </div>
-
-                    <div
-                        style={{
-                          padding: "12px",
-                          fontSize: "18px",
-                          background: "white",
-                        }}
-                    >
-                      {room.selected.map(getBedPdfLabel).join(", ")}
-                    </div>
-                  </div>
-              ))
-          )}
 
           <div
               style={{
-                marginTop: "32px",
-                paddingTop: "12px",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "12px",
+              }}
+          >
+            {bedPlan.map((room) => (
+                <div
+                    key={room.name}
+                    style={{
+                      border: "1px solid #d9cdbb",
+                      borderRadius: "10px",
+                      overflow: "hidden",
+                      background: "white",
+                    }}
+                >
+                  <div
+                      style={{
+                        background: "#9d3d32",
+                        color: "white",
+                        padding: "7px 10px",
+                        fontSize: "17px",
+                        fontWeight: 700,
+                      }}
+                  >
+                    {room.name}
+                  </div>
+
+                  <div
+                      style={{
+                        padding: "10px",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "6px",
+                      }}
+                  >
+                    {room.beds.map((bed) => {
+                      const selected = selectedBeds[bed.id];
+
+                      return (
+                          <div
+                              key={bed.id}
+                              style={{
+                                width: "44px",
+                                height: "28px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                border:
+                                    bed.type === "extra"
+                                        ? "2px dashed #9d3d32"
+                                        : "2px solid #9d3d32",
+                                background: selected ? "#9d3d32" : "#ffffff",
+                                color: selected ? "#ffffff" : "#46352d",
+                                borderRadius:
+                                    bed.type === "double-left"
+                                        ? "8px 0 0 8px"
+                                        : bed.type === "double-right"
+                                            ? "0 8px 8px 0"
+                                            : "8px",
+                                marginLeft: bed.type === "double-right" ? "-6px" : "0",
+                              }}
+                          >
+                            {getBedPdfLabel(bed)}
+                          </div>
+                      );
+                    })}
+                  </div>
+                </div>
+            ))}
+          </div>
+
+          <div
+              style={{
+                marginTop: "24px",
+                paddingTop: "10px",
                 borderTop: "1px solid #d9cdbb",
-                fontSize: "13px",
+                fontSize: "12px",
                 color: "#705f55",
                 display: "flex",
                 justifyContent: "space-between",
