@@ -426,7 +426,7 @@ export default function Home() {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                gap: "12px",
+                gap: "10px",
               }}
           >
             {bedPlan.map((room) => (
@@ -443,7 +443,7 @@ export default function Home() {
                         style={{
                             background: "#9d3d32",
                             color: "white",
-                            height: "22px",
+                            height: "35px",
 
                             display: "flex",
                             alignItems: "center",
@@ -451,8 +451,10 @@ export default function Home() {
                             paddingLeft: "8px",
                             paddingRight: "8px",
 
-                            fontSize: "13px",
+                            fontSize: "15px",
                             fontWeight: 700,
+
+                            transform: "translateY(-15px)",
                         }}
                     >
                         {room.name}
@@ -462,7 +464,7 @@ export default function Home() {
                         style={{
                             padding: "12px",
                             display: "flex",
-                            gap: "15px",
+                            gap: "10px",
                             alignItems: "flex-start",
                         }}
                     >
