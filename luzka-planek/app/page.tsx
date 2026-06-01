@@ -355,7 +355,6 @@ export default function Home() {
                       >
                           📷 {t.showPhoto}
                       </button>
-
                   </div>
 
                     <div className="flex gap-8 items-start">
