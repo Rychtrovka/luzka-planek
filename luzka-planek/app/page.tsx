@@ -8,12 +8,67 @@ import Image from "next/image";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
+type Language = "cs" | "en" | "de" | "pl";
+
+const translations = {
+    cs: {
+        title: "Výběr lůžek",
+        subtitle: "Označte prosím lůžka, která budete během pobytu používat.",
+        stay: "Termín pobytu",
+        selectedBeds: "Vybráno lůžek",
+        standardBed: "běžné lůžko",
+        doubleBed: "dvojlůžko",
+        sofaBed: "rozkládací lůžko",
+        selectAll: "Vybrat všechna lůžka",
+        clear: "Vymazat",
+        exportPdf: "Export PDF",
+    },
+    en: {
+        title: "Bed selection",
+        subtitle: "Please select the beds you will use during your stay.",
+        stay: "Stay dates",
+        selectedBeds: "Selected beds",
+        standardBed: "standard bed",
+        doubleBed: "double bed",
+        sofaBed: "sofa bed",
+        selectAll: "Select all beds",
+        clear: "Clear",
+        exportPdf: "Export PDF",
+    },
+    de: {
+        title: "Bettenauswahl",
+        subtitle: "Bitte markieren Sie die Betten, die Sie während Ihres Aufenthalts nutzen möchten.",
+        stay: "Aufenthaltszeitraum",
+        selectedBeds: "Ausgewählte Betten",
+        standardBed: "Einzelbett",
+        doubleBed: "Doppelbett",
+        sofaBed: "Schlafsofa",
+        selectAll: "Alle Betten auswählen",
+        clear: "Löschen",
+        exportPdf: "PDF exportieren",
+    },
+    pl: {
+        title: "Wybór łóżek",
+        subtitle: "Prosimy zaznaczyć łóżka, z których będą Państwo korzystać podczas pobytu.",
+        stay: "Termin pobytu",
+        selectedBeds: "Wybrane łóżka",
+        standardBed: "łóżko standardowe",
+        doubleBed: "łóżko podwójne",
+        sofaBed: "rozkładane łóżko",
+        selectAll: "Zaznacz wszystkie łóżka",
+        clear: "Wyczyść",
+        exportPdf: "Eksport PDF",
+    },
+};
+
 export default function Home() {
   const [selectedBeds, setSelectedBeds] = useState<Record<string, boolean>>({});
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [stayFrom, setStayFrom] = useState("");
   const [stayTo, setStayTo] = useState("");
+    const [language, setLanguage] = useState<Language>("cs");
+    const t = translations[language];
 
   useEffect(() => {
     const ref = doc(db, "forms", "current");
@@ -170,12 +225,29 @@ export default function Home() {
                 Rychtrova bouda Benecko
               </div>
 
+                <div className="flex gap-2 mb-3">
+                    {(["cs", "en", "de", "pl"] as Language[]).map((lang) => (
+                        <button
+                            key={lang}
+                            onClick={() => setLanguage(lang)}
+                            className={[
+                                "px-2 py-1 rounded text-xs font-bold border",
+                                language === lang
+                                    ? "bg-[var(--rb-red)] text-white border-[var(--rb-red)]"
+                                    : "bg-white/70 text-[var(--rb-brown)] border-[#d9cdbb]",
+                            ].join(" ")}
+                        >
+                            {lang.toUpperCase()}
+                        </button>
+                    ))}
+                </div>
+
               <h1 className="text-5xl italic font-bold text-[var(--rb-red)]">
-                Výběr lůžek
+                  {t.title}
               </h1>
 
               <p className="text-sm text-[var(--rb-brown)] mt-2 mb-4">
-                Označte prosím lůžka, která budete během pobytu používat.
+                {t.subtitle}
               </p>
 
               <button
@@ -184,6 +256,7 @@ export default function Home() {
               >
                 Export PDF
               </button>
+
             </div>
           </header>
 
@@ -193,7 +266,7 @@ export default function Home() {
             </div>
 
             <div className="text-neutral-600">
-              <strong>Termín pobytu:</strong>{" "}
+              <strong>{t.stay}:</strong>{" "}
               {new Date(stayFrom).toLocaleDateString("cs-CZ")} –{" "}
               {new Date(stayTo).toLocaleDateString("cs-CZ")}
             </div>
@@ -201,24 +274,24 @@ export default function Home() {
 
           <section className="bg-white/55 rounded-xl p-4 shadow-lg border border-[#d9cdbb] mb-6 max-w-3xl">
             <div className="font-semibold mb-2">
-              Vybráno lůžek: {getSelectedCount()}
+                {t.selectedBeds}: {getSelectedCount()}
             </div>
 
             <div className="flex gap-4 flex-wrap text-sm">
               <div className="flex items-center gap-2">
                 <span className="w-8 h-5 border-2 border-neutral-400 rounded bg-white" />
-                <span>běžné lůžko (S)</span>
+                <span>{t.standardBed} (S)</span>
               </div>
 
               <div className="flex items-center gap-0">
                 <span className="w-6 h-5 border-2 border-neutral-400 rounded-l bg-white" />
                 <span className="w-6 h-5 border-2 border-neutral-400 rounded-r bg-white -ml-px" />
-                <span className="ml-2">dvojlůžko (L+P)</span>
+                <span className="ml-2">{t.doubleBed} (L+P)</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="w-8 h-5 border-2 border-dashed border-neutral-400 rounded bg-white" />
-                <span>rozkládací lůžko (R+r)</span>
+                <span>{t.sofaBed} (R+r)</span>
               </div>
             </div>
           </section>
@@ -239,14 +312,14 @@ export default function Home() {
                         onClick={() => selectRoom(room.beds)}
                         className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-semibold"
                     >
-                      Vybrat všechna lůžka
+                        {t.selectAll}
                     </button>
 
                     <button
                         onClick={() => clearRoom(room.beds)}
                         className="text-sm bg-[var(--rb-red)] text-white rounded px-3 py-1 font-semibold"
                     >
-                      Vymazat
+                        {t.clear}
                     </button>
                   </div>
 
