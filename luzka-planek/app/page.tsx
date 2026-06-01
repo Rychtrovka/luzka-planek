@@ -21,7 +21,8 @@ const translations = {
         sofaBed: "rozkládací lůžko",
         selectAll: "Vybrat všechna lůžka",
         clear: "Vymazat",
-        exportPdf: "Export PDF",
+        exportPdf: "Formulář pro pokojskou",
+        showPhoto: "Ukázat fotografii pokoje"
     },
     en: {
         title: "Bed selection",
@@ -33,7 +34,8 @@ const translations = {
         sofaBed: "sofa bed",
         selectAll: "Select all beds",
         clear: "Clear",
-        exportPdf: "Export PDF",
+        exportPdf: "Housekeeping report",
+        showPhoto: "Show room photo"
     },
     de: {
         title: "Bettenauswahl",
@@ -45,7 +47,8 @@ const translations = {
         sofaBed: "Schlafsofa",
         selectAll: "Alle Betten auswählen",
         clear: "Löschen",
-        exportPdf: "PDF exportieren",
+        exportPdf: "Formular für das Reinigungspersonal",
+        showPhoto: "Zimmerfoto anzeigen"
     },
     pl: {
         title: "Wybór łóżek",
@@ -57,7 +60,8 @@ const translations = {
         sofaBed: "rozkładane łóżko",
         selectAll: "Zaznacz wszystkie łóżka",
         clear: "Wyczyść",
-        exportPdf: "Eksport PDF",
+        exportPdf: "Raport dla obsługi pokoi",
+        showPhoto: "Pokaż zdjęcie pokoju"
     },
 };
 
@@ -69,6 +73,7 @@ export default function Home() {
   const [stayTo, setStayTo] = useState("");
     const [language, setLanguage] = useState<Language>("cs");
     const t = translations[language];
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const ref = doc(db, "forms", "current");
@@ -250,12 +255,6 @@ export default function Home() {
                 {t.subtitle}
               </p>
 
-              <button
-                  onClick={exportPdf}
-                  className="bg-[var(--rb-red)] text-white rounded px-4 py-2 font-semibold"
-              >
-                Export PDF
-              </button>
 
             </div>
           </header>
@@ -296,6 +295,27 @@ export default function Home() {
             </div>
           </section>
 
+            <div className="flex justify-end mb-4">
+                <button
+                    onClick={exportPdf}
+                    className="
+      bg-[#f7f2e8]/90
+      text-[var(--rb-brown)]
+      border
+      border-[var(--rb-gold)]
+      rounded
+      px-4
+      py-2
+      text-sm
+      font-medium
+      hover:bg-white
+      transition
+    "
+                >
+                    🛎️ {t.exportPdf}
+                </button>
+            </div>
+
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {bedPlan.map((room) => (
                 <section
@@ -312,15 +332,22 @@ export default function Home() {
                         onClick={() => selectRoom(room.beds)}
                         className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-semibold"
                     >
-                        {t.selectAll}
+                        ✓ {t.selectAll}
                     </button>
 
                     <button
                         onClick={() => clearRoom(room.beds)}
                         className="text-sm bg-[var(--rb-red)] text-white rounded px-3 py-1 font-semibold"
                     >
-                        {t.clear}
+                        ✕ {t.clear}
                     </button>
+                      <button
+                          onClick={() => setPreviewImage(room.mapUrl)}
+                          className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-semibold"
+                      >
+                          📷 {t.showPhoto}
+                      </button>
+
                   </div>
 
                     <div className="flex gap-8 items-start">
@@ -652,6 +679,45 @@ export default function Home() {
             <span>RychterIS · Rychtrova bouda</span>
           </div>
         </div>
+
+          {previewImage && (
+              <div
+                  onClick={() => setPreviewImage(null)}
+                  className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"
+              >
+                  <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-white rounded-xl shadow-2xl overflow-hidden"
+                      style={{
+                          width: "1024px",
+                          maxWidth: "95vw",
+                      }}
+                  >
+                      <div className="flex items-center justify-between px-4 py-2 bg-[var(--rb-red)] text-white">
+                          <span>Fotka pokoje</span>
+
+                          <button
+                              onClick={() => setPreviewImage(null)}
+                              className="px-2 py-1 rounded bg-white/20"
+                          >
+                              ✕
+                          </button>
+                      </div>
+
+                      <div style={{ maxHeight: "80vh", overflow: "auto" }}>
+                          <img
+                              src={previewImage}
+                              alt={t.showPhoto}
+                              style={{
+                                  width: "100%",
+                                  height: "auto",
+                                  display: "block",
+                              }}
+                          />
+                      </div>
+                  </div>
+              </div>
+          )}
       </main>
   );
 }
