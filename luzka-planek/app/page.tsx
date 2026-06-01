@@ -73,7 +73,10 @@ export default function Home() {
   const [stayTo, setStayTo] = useState("");
     const [language, setLanguage] = useState<Language>("cs");
     const t = translations[language];
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<{
+        url: string;
+        roomName: string;
+    } | null>(null);
 
   useEffect(() => {
     const ref = doc(db, "forms", "current");
@@ -330,20 +333,25 @@ export default function Home() {
                   <div className="flex gap-2 mb-4">
                     <button
                         onClick={() => selectRoom(room.beds)}
-                        className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-semibold"
+                        className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-normal"
                     >
                         ✓ {t.selectAll}
                     </button>
 
                     <button
                         onClick={() => clearRoom(room.beds)}
-                        className="text-sm bg-[var(--rb-red)] text-white rounded px-3 py-1 font-semibold"
+                        className="text-sm bg-[var(--rb-red)] text-white rounded px-3 py-1 font-normal"
                     >
                         ✕ {t.clear}
                     </button>
                       <button
-                          onClick={() => setPreviewImage(room.mapUrl)}
-                          className="text-sm bg-[var(--rb-gold)] text-white rounded px-3 py-1 font-semibold"
+                          onClick={() =>
+                              setPreviewImage({
+                                  url: room.mapUrl,
+                                  roomName: room.name,
+                              })
+                          }
+                          className="text-sm bg-[var(--rb-gold)] text-white rounded px-6 py-1 font-light hover:opacity-85 transition"
                       >
                           📷 {t.showPhoto}
                       </button>
@@ -694,7 +702,7 @@ export default function Home() {
                       }}
                   >
                       <div className="flex items-center justify-between px-4 py-2 bg-[var(--rb-red)] text-white">
-                          <span>Fotka pokoje</span>
+                          <span>{previewImage.roomName}</span>
 
                           <button
                               onClick={() => setPreviewImage(null)}
@@ -706,7 +714,7 @@ export default function Home() {
 
                       <div style={{ maxHeight: "80vh", overflow: "auto" }}>
                           <img
-                              src={previewImage}
+                              src={previewImage.url}
                               alt={t.showPhoto}
                               style={{
                                   width: "100%",
